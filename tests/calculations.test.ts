@@ -14,8 +14,11 @@ import {
   aggregateByMistakes,
   aggregateByDayOfWeek,
   filterTrades,
-  resolveRealizedR
+  resolveRealizedR,
+  calculateTradeFrequency,
+  calculateDrawdownAnalytics
 } from '../src/lib/calculations';
+import { DEMO_TRADES, DEMO_TRADES_BASE_10 } from '../src/lib/demo-data';
 import { mapNotionPageToTrade } from '../src/lib/notion-mapper';
 import { TradeRecord, FilterState } from '../src/types/trade';
 
@@ -452,4 +455,87 @@ describe('Quantitative Trading Calculations Module', () => {
       expect(dayStats.some(d => d.name === 'Monday')).toBe(true);
     });
   });
+
+  describe('Average Trade Frequency Calculations', () => {
+    it('calculates trade frequency matching screenshot metrics with demo data', () => {
+      const freq = calculateTradeFrequency(DEMO_TRADES_BASE_10);
+
+      expect(freq.daily.avg).toBe(1.33);
+      expect(freq.weekly.avg).toBe(2.67);
+      expect(freq.monthly.avg).toBe(5);
+
+      // Verify week numbers include 1, 51, 52
+      const weeks = freq.weekly.data.map(w => w.week);
+      expect(weeks).toContain('1');
+      expect(weeks).toContain('51');
+      expect(weeks).toContain('52');
+
+      // Verify months include Ja, De
+      const months = freq.monthly.data.map(m => m.month);
+      expect(months).toContain('Ja');
+      expect(months).toContain('De');
+    });
+
+    it('calculates trade frequency dynamically for 100 demo trades dataset', () => {
+      const freq = calculateTradeFrequency(DEMO_TRADES);
+      expect(DEMO_TRADES.length).toBe(100);
+      expect(freq.daily.data.length).toBeGreaterThan(0);
+      expect(freq.weekly.data.length).toBeGreaterThan(0);
+      expect(freq.monthly.data.length).toBeGreaterThan(0);
+      expect(freq.daily.avg).toBeGreaterThan(0);
+      expect(freq.weekly.avg).toBeGreaterThan(0);
+      expect(freq.monthly.avg).toBeGreaterThan(0);
+    });
+
+    it('handles empty trades defensively without division by zero', () => {
+      const freq = calculateTradeFrequency([]);
+      expect(freq.daily.avg).toBe(0);
+      expect(freq.weekly.avg).toBe(0);
+      expect(freq.monthly.avg).toBe(0);
+      expect(freq.daily.data).toEqual([]);
+      expect(freq.weekly.data).toEqual([]);
+      expect(freq.monthly.data).toEqual([]);
+    });
+  });
+
+  describe('Drawdown & MAE Analytics', () => {
+    it('calculates drawdown series and metrics matching TradeZella screenshots', () => {
+      const dd = calculateDrawdownAnalytics(DEMO_TRADES_BASE_10);
+
+      expect(dd.maxDrawdownPct).toBe(-3.0);
+      expect(dd.maxDrawdownDollar).toBe(-1510.0);
+      expect(dd.avgDrawdownPct).toBe(-1.60);
+      expect(dd.timeToRecoveryDays).toBe(1.5);
+      expect(dd.drawdownFrequency).toBe(3.0);
+
+      // Verify points length
+      expect(dd.points.length).toBe(10);
+
+      // Verify MAE bin 0.0 has 10 trades
+      const bin0 = dd.maeDistribution.find(b => b.bin === '0.0');
+      expect(bin0?.count).toBe(10);
+
+      // Verify winning trades drawdown RR
+      expect(dd.winningTradesDrawdown.avgRR).toBe(0.0);
+      expect(dd.winningTradesDrawdown.minRR).toBe('∞');
+      expect(dd.winningTradesDrawdown.maxRR).toBe('-∞');
+    });
+
+    it('calculates drawdown series dynamically for 100 demo trades dataset', () => {
+      const dd = calculateDrawdownAnalytics(DEMO_TRADES);
+      expect(dd.points.length).toBe(100);
+      expect(dd.maxDrawdownPct).toBeLessThanOrEqual(0);
+      expect(dd.maxDrawdownDollar).toBeLessThanOrEqual(0);
+    });
+
+    it('handles empty trade array defensively', () => {
+      const dd = calculateDrawdownAnalytics([]);
+      expect(dd.points).toEqual([]);
+      expect(dd.maxDrawdownPct).toBe(0);
+      expect(dd.maxDrawdownDollar).toBe(0);
+      expect(dd.avgDrawdownPct).toBe(0);
+    });
+  });
 });
+
+

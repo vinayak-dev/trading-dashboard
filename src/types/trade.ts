@@ -18,8 +18,10 @@ export interface TradeRecord {
   id: string;
   date: string | null; // YYYY-MM-DD
   dateTime?: string | null; // ISO string if available
+  formattedDate?: string; // e.g. "01/02/2026, 18:34:55"
   title: string;
   ticker: TradeTicker | null;
+  symbol?: string; // e.g. "CME_MINI:YM1"
   position: TradePosition | null;
   sequence: TradeSequence | null;
   result: TradeResult | null;
@@ -30,6 +32,9 @@ export interface TradeRecord {
   plannedRR: number | null;
   realizedR: number | null; // Outcome in R units (e.g., +2.5, -1.0, 0.0)
   rawRR: number | null; // Raw number from Notion RR field
+  dollarPnl?: number | null; // Dollar PnL amount
+  pnlDollar?: number | null; // Alias for dollarPnl
+  duration?: string; // e.g. "7h 10m"
   screenshots: ScreenshotFile[];
   notionUrl: string | null;
   isExecutedTrade: boolean; // True if Result is Win, Loss, or Break Even (excludes No Trade)
@@ -66,17 +71,55 @@ export interface KPIMetrics {
   maxDrawdownPercent: number | null;
   validSetupsMissed: number;       // Trades with "Missed valid setup" mistake tag
   hasRealizedRData: boolean;       // Indicates if realized R is available
+
+  // Dollar and Screenshot-Matched Trading Analytics Metrics
+  totalPnl: number;
+  accountBalance: number;
+  accountGainPct: number;
+  riskRewardRatio: number;
+  monthGainLoss: number;
+  weekGainLoss: number;
+  dailyGainLoss: number;
+
+  // Winners & Losers Deep Stats (Image 3)
+  bestWinPct: number;
+  avgWinPct: number;
+  worstLossPct: number;
+  avgLossPct: number;
+  avgWinDuration: string;
+  avgLossDuration: string;
+  maxConsecutiveWins: number;
+  avgConsecutiveWins: number;
+  maxConsecutiveLosses: number;
+  avgConsecutiveLosses: number;
+
+  // Performance By Side (Image 3)
+  buyTradesCount: number;
+  sellTradesCount: number;
+  buyWinRate: number;
+  sellWinRate: number;
+
+  // RR Cards (Image 2)
+  averageRR: number;
+  maxRR: number;
+  idealAverageRR: number;
+  maxIdealRR: number;
+  couldHaveProfitBE: number;
 }
 
 export interface EquityCurvePoint {
   tradeIndex: number;
   tradeId: string;
   date: string;
+  rawDate?: string;
   title: string;
   ticker: string;
   result: TradeResult | 'Unknown';
   individualR: number | null;
   cumulativeR: number;
+  individualPnl: number;
+  cumulativePnl: number;
+  accountBalance: number;
   peakR: number;
   drawdownR: number;
 }
@@ -94,6 +137,13 @@ export interface CategoryMetric {
   profitFactor: number | null;
   avgWinR: number | null;
   avgLossR: number | null;
+  pnl?: number;
+}
+
+export interface MonthPerformanceData {
+  year: number;
+  months: (number | null)[]; // 12 elements (Jan..Dec) representing % gain or null
+  ytd: number;
 }
 
 export interface QuantitativeInsight {
