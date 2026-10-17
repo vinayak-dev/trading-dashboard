@@ -1,0 +1,6 @@
+# Cloudflare Pages / Workers local environment variables (for wrangler pages dev / wrangler dev)
+# Copy this file to .dev.vars (which is ignored by git) and replace with your actual values:
+NOTION_TOKEN="secret_your_notion_integration_token_here"
+NOTION_DATABASE_ID="your_notion_database_uuid_here"
+# Optional data source alias if using specific Notion workspace references:
+NOTION_DATA_SOURCE_ID="your_notion_data_source_id_here"

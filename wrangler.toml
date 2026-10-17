@@ -1,0 +1,10 @@
+name = "notion-trading-dashboard"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "./dist"
+
+# In production Cloudflare Pages, configure secrets (NOTION_TOKEN, NOTION_DATABASE_ID) via:
+# 1. Cloudflare Dashboard -> Workers & Pages -> notion-trading-dashboard -> Settings -> Environment Variables
+# 2. Or using Wrangler CLI:
+#    npx wrangler pages secret put NOTION_TOKEN
+#    npx wrangler pages secret put NOTION_DATABASE_ID
+#    npx wrangler pages secret put NOTION_DATA_SOURCE_ID
