@@ -407,6 +407,33 @@ describe('Quantitative Trading Calculations Module', () => {
       expect(mapped.ruleAdherence).toBe('Followed');
       expect(mapped.mistakes).toEqual([]); // 'none' tag ignored
     });
+
+    it('maps all 4 uploaded screenshots accurately from Notion files property', () => {
+      const pageWith4Screenshots = {
+        id: 'page-screenshots-4',
+        properties: {
+          Trade: { type: 'title', title: [{ plain_text: 'Trade with 4 Charts' }] },
+          Date: { type: 'date', date: { start: '2026-07-06' } },
+          Screenshots: {
+            type: 'files',
+            files: [
+              { name: 'Frame 2504.jpg', file: { url: 'https://aws.s3/img1.jpg', expiry_time: '2026-07-07T00:00:00Z' } },
+              { name: '15m Entry.png', file: { url: 'https://aws.s3/img2.png', expiry_time: '2026-07-07T00:00:00Z' } },
+              { name: '5m Exit.png', file: { url: 'https://aws.s3/img3.png', expiry_time: '2026-07-07T00:00:00Z' } },
+              { name: 'Daily Context.png', file: { url: 'https://aws.s3/img4.png', expiry_time: '2026-07-07T00:00:00Z' } },
+            ]
+          }
+        }
+      };
+
+      const mapped = mapNotionPageToTrade(pageWith4Screenshots);
+      expect(mapped.screenshots).toHaveLength(4);
+      expect(mapped.screenshots[0].name).toBe('Frame 2504.jpg');
+      expect(mapped.screenshots[0].url).toBe('https://aws.s3/img1.jpg');
+      expect(mapped.screenshots[1].name).toBe('15m Entry.png');
+      expect(mapped.screenshots[2].name).toBe('5m Exit.png');
+      expect(mapped.screenshots[3].name).toBe('Daily Context.png');
+    });
   });
 
   describe('Average Win / Loss R and KPI Aggregation', () => {

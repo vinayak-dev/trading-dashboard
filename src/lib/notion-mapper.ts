@@ -139,18 +139,50 @@ export function mapNotionPageToTrade(page: any): TradeRecord {
   const realizedR = resolveRealizedR(rawRR, result);
   const plannedRR = rawRR !== null ? Math.abs(rawRR) : null;
 
-  // 13. Screenshots: Files array
+  // 13. Screenshots: Files array (collect all uploaded screenshot files)
   const screenshots: ScreenshotFile[] = [];
-  const screensProp = props['Screenshots'] || props['Screenshot'];
-  if (screensProp?.type === 'files' && Array.isArray(screensProp.files)) {
-    for (const file of screensProp.files) {
-      const url = file?.file?.url || file?.external?.url;
-      if (url) {
-        screenshots.push({
-          name: file.name || 'Screenshot',
-          url,
-          expiryTime: file?.file?.expiry_time || null,
-        });
+  const seenUrls = new Set<string>();
+
+  const appendFile = (file: any, defaultName: string) => {
+    const url = file?.file?.url || file?.external?.url;
+    if (url && !seenUrls.has(url)) {
+      seenUrls.add(url);
+      screenshots.push({
+        name: file.name || defaultName,
+        url,
+        expiryTime: file?.file?.expiry_time || null,
+      });
+    }
+  };
+
+  const primaryKeys = [
+    'Screenshots',
+    'Screenshot',
+    'screenshots',
+    'screenshot',
+    'Images',
+    'Image',
+    'Media',
+    'Chart',
+    'Charts',
+    'Files',
+    'File',
+  ];
+
+  for (const key of primaryKeys) {
+    const prop = props[key];
+    if (prop?.type === 'files' && Array.isArray(prop.files)) {
+      for (const f of prop.files) {
+        appendFile(f, f.name || key);
+      }
+    }
+  }
+
+  // Also scan any other properties in the page of type 'files'
+  for (const [key, prop] of Object.entries(props) as [string, any][]) {
+    if (prop?.type === 'files' && Array.isArray(prop.files)) {
+      for (const f of prop.files) {
+        appendFile(f, f.name || key);
       }
     }
   }
