@@ -78,7 +78,7 @@ export const TradeFrequencySection: React.FC<TradeFrequencySectionProps> = ({ st
                   allowDecimals={true}
                 />
                 <Tooltip
-                  cursor={{ fill: 'rgba(255, 255, 255, 0.03)' }}
+                  cursor={false}
                   content={({ active, payload }) => {
                     if (active && payload && payload.length) {
                       const d = payload[0].payload;
@@ -150,7 +150,7 @@ export const TradeFrequencySection: React.FC<TradeFrequencySectionProps> = ({ st
                   allowDecimals={true}
                 />
                 <Tooltip
-                  cursor={{ fill: 'rgba(255, 255, 255, 0.03)' }}
+                  cursor={false}
                   content={({ active, payload }) => {
                     if (active && payload && payload.length) {
                       const d = payload[0].payload;
@@ -221,7 +221,7 @@ export const TradeFrequencySection: React.FC<TradeFrequencySectionProps> = ({ st
                   domain={[0, (dataMax: number) => Math.max(8, Math.ceil(dataMax))]}
                 />
                 <Tooltip
-                  cursor={{ fill: 'rgba(255, 255, 255, 0.03)' }}
+                  cursor={false}
                   content={({ active, payload }) => {
                     if (active && payload && payload.length) {
                       const d = payload[0].payload;

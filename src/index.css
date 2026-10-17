@@ -42,6 +42,14 @@ body {
   box-shadow: 0 14px 30px -5px rgba(0, 0, 0, 0.7) !important;
 }
 
+/* Remove default white/light cursor highlight across all charts */
+.recharts-tooltip-cursor,
+rect.recharts-tooltip-cursor,
+path.recharts-tooltip-cursor {
+  fill: transparent !important;
+  fill-opacity: 0 !important;
+}
+
 .recharts-cartesian-grid line {
   stroke: #1f242e !important;
   stroke-dasharray: 4 4;

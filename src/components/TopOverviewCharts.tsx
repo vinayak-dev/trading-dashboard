@@ -61,6 +61,7 @@ export const TopOverviewCharts: React.FC<TopOverviewChartsProps> = ({
                 tickFormatter={formatK}
               />
               <Tooltip
+                cursor={{ stroke: '#2e3644', strokeWidth: 1 }}
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
                     const pt = payload[0].payload as EquityCurvePoint;
@@ -128,6 +129,7 @@ export const TopOverviewCharts: React.FC<TopOverviewChartsProps> = ({
                 axisLine={{ stroke: '#1f242e' }}
               />
               <Tooltip
+                cursor={false}
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
                     const d = payload[0].payload;
@@ -180,6 +182,7 @@ export const TopOverviewCharts: React.FC<TopOverviewChartsProps> = ({
                 tickFormatter={formatK}
               />
               <Tooltip
+                cursor={false}
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
                     const d = payload[0].payload;

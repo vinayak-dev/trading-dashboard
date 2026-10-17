@@ -204,6 +204,7 @@ export const ProfitLossSection: React.FC<ProfitLossSectionProps> = ({
                 tickFormatter={formatK}
               />
               <Tooltip
+                cursor={false}
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
                     const pt = payload[0].payload as EquityCurvePoint;

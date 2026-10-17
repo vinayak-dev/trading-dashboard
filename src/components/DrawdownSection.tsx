@@ -192,7 +192,7 @@ export const DrawdownSection: React.FC<DrawdownSectionProps> = ({
               />
 
               <Tooltip
-                cursor={{ fill: 'rgba(255, 255, 255, 0.03)' }}
+                cursor={{ stroke: '#2e3644', strokeWidth: 1 }}
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
                     const d = payload[0].payload as (typeof chartData)[0];
@@ -347,7 +347,7 @@ export const DrawdownSection: React.FC<DrawdownSectionProps> = ({
               />
 
               <Tooltip
-                cursor={{ fill: 'rgba(255, 255, 255, 0.03)' }}
+                cursor={false}
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
                     const d = payload[0].payload;

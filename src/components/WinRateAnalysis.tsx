@@ -156,6 +156,7 @@ export const WinRateAnalysis: React.FC<WinRateAnalysisProps> = ({
                   tickFormatter={v => `${v}%`}
                 />
                 <Tooltip
+                  cursor={false}
                   content={({ active, payload }) => {
                     if (active && payload && payload.length) {
                       const d = payload[0].payload;

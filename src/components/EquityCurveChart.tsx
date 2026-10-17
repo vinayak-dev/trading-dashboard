@@ -205,7 +205,7 @@ export const EquityCurveChart: React.FC<EquityCurveChartProps> = ({
                 axisLine={{ stroke: '#1e293b' }}
                 tickFormatter={(val: number) => `${val}R`}
               />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip cursor={{ stroke: '#2e3644', strokeWidth: 1 }} content={<CustomTooltip />} />
               <ReferenceLine y={0} stroke="#475569" strokeDasharray="2 2" />
               <Area
                 type="monotone"
@@ -240,7 +240,7 @@ export const EquityCurveChart: React.FC<EquityCurveChartProps> = ({
                 reversed
                 tickFormatter={(val: number) => `-${val}R`}
               />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip cursor={{ stroke: '#2e3644', strokeWidth: 1 }} content={<CustomTooltip />} />
               <ReferenceLine y={0} stroke="#475569" strokeDasharray="2 2" />
               <Area
                 type="monotone"
