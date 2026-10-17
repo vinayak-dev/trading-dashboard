@@ -1,24 +1,26 @@
 # Notion Trading Analytics Dashboard
 
-A production-ready, quantitative trading analytics dashboard built for NQ (Nasdaq) and ES (S&P 500) futures day traders. It connects directly and securely to your Notion **Daily Trade Log** journal via the Notion API, displaying interactive analytics charts, win-rate expectancy, multi-tag mistake impacts, rule adherence discipline metrics, and cumulative realized-R equity curves.
+A production-ready, quantitative trading analytics dashboard built for NQ (Nasdaq) and ES (S&P 500) futures day traders. Deployed as a **Cloudflare Worker with Static Assets** on a free `workers.dev` URL, it connects securely to your Notion **Daily Trade Log** journal via the Notion API, displaying interactive analytics charts, win-rate expectancy, multi-tag mistake impacts, rule adherence discipline metrics, and cumulative realized-R equity curves.
 
 ---
 
 ## 1. Architecture & Tech Stack
 
-- **Frontend**: React 18, TypeScript, Tailwind CSS, Recharts, Lucide Icons, Vite.
-- **Backend API**: Cloudflare Pages Functions (`functions/api/trades.ts`).
+- **Frontend**: React 18, TypeScript, Tailwind CSS, Recharts, Lucide Icons, Vite (built into `./dist`).
+- **Backend API**: Cloudflare Worker with Static Assets (`worker/index.ts`).
+- **Static Assets Binding**: Vite `./dist` served directly via Cloudflare Worker Static Assets (`ASSETS` binding with SPA fallback).
 - **Database / Source of Truth**: Notion Database (`Daily Trade Log`) — strictly **read-only**.
-- **Runtime**: 100% serverless, edge-native, zero continuous Node.js server, compatible with Cloudflare's **Free Tier**.
+- **Runtime**: Serverless Cloudflare Worker, edge-native, zero continuous Node.js server, compatible with Cloudflare's **Free Tier** and custom/free `*.workers.dev` subdomain.
 
 ---
 
 ## 2. Security & Credentials Architecture
 
-Server secrets (`NOTION_TOKEN`, `NOTION_DATABASE_ID`) are executed exclusively within Cloudflare serverless edge functions.
+Server secrets (`NOTION_TOKEN`, `NOTION_DATABASE_ID`, `NOTION_DATA_SOURCE_ID`) are executed exclusively within the serverless Cloudflare Worker.
 - **Zero Client Exposure**: Secrets are never sent to the browser, never baked into frontend JavaScript bundles, and excluded from source maps.
 - **Git Protection**: `.gitignore` strictly excludes `.env*`, `.dev.vars`, and credentials.
 - **Read-Only**: The backend function only executes Notion `POST /databases/{id}/query`. It contains no write, update, or delete capabilities.
+- **API Isolation**: All `/api/*` routes are handled directly by the Worker and will never accidentally return `index.html`.
 
 ---
 
@@ -43,6 +45,7 @@ Ensure `.dev.vars` contains:
 ```ini
 NOTION_TOKEN="ntn_your_notion_token"
 NOTION_DATABASE_ID="bc4cdd5b-c7d9-4c53-9c02-5111e5762d50"
+# Or NOTION_DATA_SOURCE_ID="your_notion_data_source_id"
 ```
 
 ### Step 3: Run the Development Server
@@ -50,6 +53,12 @@ NOTION_DATABASE_ID="bc4cdd5b-c7d9-4c53-9c02-5111e5762d50"
 npm run dev
 ```
 Open [http://localhost:5173](http://localhost:5173). The Vite development server includes a local API handler that queries your Notion database directly.
+
+Alternatively, to test the exact Cloudflare Worker runtime locally:
+```bash
+npm run build
+npm run worker:dev
+```
 
 ### Step 4: Run Tests
 ```bash
@@ -100,58 +109,43 @@ If connecting a new database or integration from scratch:
 
 ---
 
-## 6. Access Protection (Private Dashboard Security)
+## 6. Cloudflare Worker Deployment (workers.dev)
 
-Because this dashboard displays your personal financial journal, do not leave it publicly open on the internet:
-
-### Recommended: Cloudflare Zero Trust (Cloudflare Access) — Free Tier
-1. In Cloudflare Dashboard, go to **Zero Trust** -> **Access** -> **Applications**.
-2. Click **Add an application** -> **Self-hosted**.
-3. Name: `Trading Journal Analytics`.
-4. Domain: Point to your Cloudflare Pages domain (e.g. `trading.yourdomain.com` or `*.pages.dev`).
-5. Add a Policy:
-   - Action: `Allow`
-   - Rule: `Include Emails` -> enter your personal email address.
-6. Now whenever you visit the dashboard, Cloudflare prompts for a one-time PIN sent to your email before letting anyone access the page or `/api/trades`.
-
----
-
-## 7. Cloudflare Pages Deployment
-
-### Option A: One-Command Wrangler CLI Deploy
-Build the frontend and deploy the site along with Pages Functions:
-
+### Step 1: Build the Frontend Static Assets
 ```bash
-# 1. Build the production bundle
 npm run build
-
-# 2. Deploy to Cloudflare Pages
-npx wrangler pages deploy dist --project-name=notion-trading-dashboard
 ```
+This compiles TypeScript and builds the Vite frontend into `./dist`.
 
-### Option B: Configure Cloudflare Secrets in Production
-After deployment, set the secrets in Cloudflare:
+### Step 2: Deploy the Cloudflare Worker
+```bash
+npx wrangler deploy
+# or: npm run deploy
+```
+Wrangler will package `worker/index.ts` and attach the static assets in `./dist`. You will receive a live URL:
+`https://notion-trading-dashboard.<your-subdomain>.workers.dev`
+
+### Step 3: Set Server-Side Secrets
+In production on Cloudflare Workers, secrets must be set securely via Wrangler CLI:
 
 ```bash
-npx wrangler pages secret put NOTION_TOKEN
-# Paste your token: ntn_...
+npx wrangler secret put NOTION_TOKEN
+# Paste your Notion integration token: ntn_...
 
-npx wrangler pages secret put NOTION_DATABASE_ID
+npx wrangler secret put NOTION_DATABASE_ID
 # Paste: bc4cdd5b-c7d9-4c53-9c02-5111e5762d50
 ```
-
-Or configure via the Cloudflare Web Dashboard:
-1. Navigate to **Workers & Pages** -> **notion-trading-dashboard**.
-2. Go to **Settings** -> **Environment variables**.
-3. Add `NOTION_TOKEN` (encrypt as secret) and `NOTION_DATABASE_ID`.
+*(If you use `NOTION_DATA_SOURCE_ID`, you can set `npx wrangler secret put NOTION_DATA_SOURCE_ID` instead; the worker checks `NOTION_DATABASE_ID || NOTION_DATA_SOURCE_ID`).*
 
 ---
 
-## 8. Troubleshooting & Verification Checklist
+## 7. Troubleshooting & Verification Checklist
 
+- [x] **`wrangler deploy` succeeds without Pages error**: `pages_build_output_dir` has been removed and replaced with modern `[assets]` static assets configuration.
+- [x] **`/api/trades` returns JSON, not index.html**: The Worker explicitly handles `/api/trades` and all `/api/*` routes before delegating to `env.ASSETS.fetch`.
 - [x] **200 OK / Empty Records?** Verify you have shared the database page with your integration ("Connect to" in Notion).
 - [x] **401 Unauthorized?** Ensure `NOTION_TOKEN` has no leading or trailing whitespace.
 - [x] **404 Object Not Found?** Double-check `NOTION_DATABASE_ID`. Do not use the view ID (the `v=...` query string).
 - [x] **Missing RR values?** If Net R and Equity curve show N/A, check the Diagnostics modal in the header. Enter numeric R values in the `RR` property in Notion to unlock Realized R metrics.
 - [x] **Expired Screenshot Links?** Notion S3 links expire after 1 hour by design. Clicking **Refresh** retrieves fresh signed image URLs.
-- [x] **Cloudflare Free Tier Quota**: Free tier includes 100,000 Worker requests/day, which is more than sufficient for on-demand personal trading analytics.
+- [x] **Cloudflare Free Tier Quota**: Free tier includes 100,000 Worker requests/day, which is more than sufficient for personal trading analytics.

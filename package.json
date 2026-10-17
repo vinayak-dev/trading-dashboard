@@ -9,8 +9,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "pages:dev": "wrangler pages dev dist --compatibility-date=2024-01-01",
-    "deploy": "wrangler pages deploy dist --project-name=notion-trading-dashboard"
+    "worker:dev": "wrangler dev",
+    "deploy": "wrangler deploy"
   },
   "dependencies": {
     "clsx": "^2.1.1",

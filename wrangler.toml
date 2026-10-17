@@ -1,10 +1,21 @@
 name = "notion-trading-dashboard"
+main = "worker/index.ts"
 compatibility_date = "2024-01-01"
-pages_build_output_dir = "./dist"
+compatibility_flags = ["nodejs_compat"]
 
-# In production Cloudflare Pages, configure secrets (NOTION_TOKEN, NOTION_DATABASE_ID) via:
-# 1. Cloudflare Dashboard -> Workers & Pages -> notion-trading-dashboard -> Settings -> Environment Variables
-# 2. Or using Wrangler CLI:
-#    npx wrangler pages secret put NOTION_TOKEN
-#    npx wrangler pages secret put NOTION_DATABASE_ID
-#    npx wrangler pages secret put NOTION_DATA_SOURCE_ID
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+# Production Worker secrets and variables:
+# Set your server-side secret using Wrangler CLI:
+#   npx wrangler secret put NOTION_TOKEN
+#
+# Set environment variables (or secrets):
+#   npx wrangler secret put NOTION_DATABASE_ID
+# (or NOTION_DATA_SOURCE_ID)
+#
+# For local Worker development:
+#   npm run worker:dev
+# (reads secrets from .dev.vars)
