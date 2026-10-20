@@ -141,13 +141,28 @@ export function calculateMaxDrawdown(trades: TradeRecord[]): {
   };
 }
 
+export interface StreakStats {
+  maxConsecutiveWins: number;
+  avgConsecutiveWins: number;
+  maxConsecutiveLosses: number;
+  avgConsecutiveLosses: number;
+  currentStreak: {
+    type: 'win' | 'loss' | 'none';
+    count: number;
+  };
+}
+
 /**
  * Calculates win and loss streaks.
  */
-export function calculateStreakStats(trades: TradeRecord[]) {
+export function calculateStreakStats(trades: TradeRecord[]): StreakStats {
   const executed = trades
     .filter(t => t.isExecutedTrade && (t.result === 'Win' || t.result === 'Loss'))
-    .sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+    .sort((a, b) => {
+      const dateA = a.dateTime || a.date || '';
+      const dateB = b.dateTime || b.date || '';
+      return dateA.localeCompare(dateB);
+    });
 
   const winStreaks: number[] = [];
   const lossStreaks: number[] = [];
@@ -169,6 +184,14 @@ export function calculateStreakStats(trades: TradeRecord[]) {
       curLoss++;
     }
   }
+
+  const currentStreak: { type: 'win' | 'loss' | 'none'; count: number } =
+    curWin > 0
+      ? { type: 'win', count: curWin }
+      : curLoss > 0
+      ? { type: 'loss', count: curLoss }
+      : { type: 'none', count: 0 };
+
   if (curWin > 0) winStreaks.push(curWin);
   if (curLoss > 0) lossStreaks.push(curLoss);
 
@@ -189,6 +212,7 @@ export function calculateStreakStats(trades: TradeRecord[]) {
     avgConsecutiveWins,
     maxConsecutiveLosses,
     avgConsecutiveLosses,
+    currentStreak,
   };
 }
 
@@ -306,6 +330,7 @@ export function calculateKPIMetrics(trades: TradeRecord[]): KPIMetrics {
     avgConsecutiveWins: streaks.avgConsecutiveWins || 1.5,
     maxConsecutiveLosses: streaks.maxConsecutiveLosses || 2,
     avgConsecutiveLosses: streaks.avgConsecutiveLosses || 1.33,
+    currentStreak: streaks.currentStreak,
 
     buyTradesCount: buyTrades.length || 5,
     sellTradesCount: sellTrades.length || 5,

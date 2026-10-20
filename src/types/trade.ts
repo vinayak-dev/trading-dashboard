@@ -92,6 +92,10 @@ export interface KPIMetrics {
   avgConsecutiveWins: number;
   maxConsecutiveLosses: number;
   avgConsecutiveLosses: number;
+  currentStreak?: {
+    type: 'win' | 'loss' | 'none';
+    count: number;
+  };
 
   // Performance By Side (Image 3)
   buyTradesCount: number;

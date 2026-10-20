@@ -617,7 +617,7 @@ export const PerformanceCalendarSection: React.FC<PerformanceCalendarSectionProp
                       setIsYearPickerOpen(!isYearPickerOpen);
                       setIsMonthPickerOpen(false);
                     }}
-                    className="text-xs font-semibold text-slate-100 hover:text-blue-400 px-2 min-w-[55px] text-center hover:bg-[#252c3b] rounded py-0.5 transition-colors flex items-center justify-center gap-1"
+                    className="text-xs font-semibold text-slate-100 hover:text-white px-2 min-w-[55px] text-center hover:bg-[#252c3b] rounded py-0.5 transition-colors flex items-center justify-center gap-1"
                     title="Click to view all years"
                   >
                     <span>{currentYear}</span>
@@ -654,7 +654,7 @@ export const PerformanceCalendarSection: React.FC<PerformanceCalendarSectionProp
                             }}
                             className={`px-2 py-2 rounded-lg text-xs font-medium transition-all text-center ${
                               isSelected
-                                ? 'bg-blue-600 text-white font-bold shadow-md shadow-blue-900/40'
+                                ? 'bg-[#2b3345] text-white font-bold shadow-md'
                                 : 'text-slate-300 hover:bg-[#222a3a] hover:text-white'
                             }`}
                           >
@@ -721,7 +721,7 @@ export const PerformanceCalendarSection: React.FC<PerformanceCalendarSectionProp
                   hoverClass = 'hover:border-slate-500 cursor-pointer';
                 }
               } else if (isToday) {
-                bgClass = 'bg-[#131b2c]/80 border-blue-500/50 shadow-sm shadow-blue-950/20';
+                bgClass = 'bg-[#161a24] border-slate-500/50 shadow-sm';
               }
 
               return (
@@ -733,12 +733,12 @@ export const PerformanceCalendarSection: React.FC<PerformanceCalendarSectionProp
                     }
                   }}
                   className={`relative min-h-[90px] sm:min-h-[104px] p-2 sm:p-2.5 rounded-xl border flex flex-col justify-between transition-all ${bgClass} ${hoverClass} ${
-                    isToday ? 'ring-1 ring-blue-500/50' : ''
+                    isToday ? 'ring-1 ring-slate-400' : ''
                   }`}
                 >
                   <div className="flex items-center justify-between text-[11px]">
                     {isToday ? (
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/40">
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#1e232e] text-slate-200 border border-[#303848]">
                         Today
                       </span>
                     ) : hasTrades && cell.isCurrentMonth ? (
@@ -751,7 +751,7 @@ export const PerformanceCalendarSection: React.FC<PerformanceCalendarSectionProp
                     <span
                       className={`font-semibold ${
                         isToday
-                          ? 'text-blue-400 font-bold'
+                          ? 'text-white font-bold'
                           : cell.isCurrentMonth
                           ? hasTrades
                             ? 'text-white'
@@ -859,7 +859,7 @@ export const PerformanceCalendarSection: React.FC<PerformanceCalendarSectionProp
                       className={`px-1.5 py-0.5 text-[10px] font-bold rounded ${
                         t.position === 'Long'
                           ? 'bg-emerald-500/20 text-emerald-400'
-                          : 'bg-blue-500/20 text-blue-400'
+                          : 'bg-rose-500/20 text-rose-400'
                       }`}
                     >
                       {t.position || 'Trade'}

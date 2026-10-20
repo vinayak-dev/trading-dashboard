@@ -14,12 +14,18 @@ import { TradeRecord, ScreenshotFile } from '../types/trade';
 
 interface RecentTradesTableProps {
   trades: TradeRecord[];
+  title?: string;
+  defaultPageSize?: number;
 }
 
-export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({ trades }) => {
+export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({
+  trades,
+  title = 'Recent Trades',
+  defaultPageSize = 5,
+}) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(defaultPageSize);
   const [showExtendedColumns, setShowExtendedColumns] = useState(false);
   const [expandedTradeId, setExpandedTradeId] = useState<string | null>(null);
 
@@ -158,7 +164,7 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({ trades }) 
       {/* Table Header matching Image 1 */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">Recent Trades</h3>
+          <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">{title}</h3>
         </div>
 
         <div className="flex items-center gap-3">
@@ -173,7 +179,7 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({ trades }) 
                 setSearchTerm(e.target.value);
                 setPage(1);
               }}
-              className="bg-[#191d26] border border-[#2b313e] focus:border-blue-500 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 w-36 sm:w-48 focus:outline-none transition-colors"
+              className="bg-[#191d26] border border-[#2b313e] focus:border-slate-400 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 w-36 sm:w-48 focus:outline-none transition-colors"
             />
           </div>
 
@@ -182,7 +188,7 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({ trades }) 
             onClick={() => setShowExtendedColumns(!showExtendedColumns)}
             className={`px-3 py-1.5 rounded-lg border text-xs font-medium flex items-center gap-1.5 transition-colors ${
               showExtendedColumns
-                ? 'bg-blue-600/20 border-blue-500 text-blue-400'
+                ? 'bg-[#222834] border-[#384254] text-white shadow-sm'
                 : 'bg-[#191d26] border-[#2b313e] text-slate-400 hover:text-white'
             }`}
             title="Toggle Notion columns: Adherence, Mistakes, Screenshots"
@@ -247,7 +253,7 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({ trades }) 
                       className="hover:bg-[#161a23] transition-colors cursor-pointer group"
                     >
                       {/* Name */}
-                      <td className="py-3.5 px-4 font-medium text-slate-200 group-hover:text-blue-400 transition-colors">
+                      <td className="py-3.5 px-4 font-medium text-slate-200 group-hover:text-white transition-colors">
                         <div className="flex items-center gap-2">
                           <span>{trade.title}</span>
                           {trade.position && (
@@ -255,7 +261,7 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({ trades }) 
                               className={`px-1.5 py-0.5 text-[10px] rounded font-bold ${
                                 trade.position === 'Long'
                                   ? 'bg-[#00c076]/10 text-[#00c076]'
-                                  : 'bg-[#0084ff]/10 text-[#0084ff]'
+                                  : 'bg-[#ff4d4d]/10 text-[#ff4d4d]'
                               }`}
                             >
                               {trade.position}
@@ -267,7 +273,7 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({ trades }) 
                                 e.stopPropagation();
                                 openGallery(trade, 0);
                               }}
-                              className="ml-1 px-1.5 py-0.5 rounded bg-blue-500/10 hover:bg-blue-500/25 text-blue-400 hover:text-blue-300 transition-colors inline-flex items-center gap-1 border border-blue-500/25 text-[10px] font-semibold"
+                              className="ml-1 px-1.5 py-0.5 rounded bg-[#1e232e] hover:bg-[#282f3e] text-slate-300 hover:text-white transition-colors inline-flex items-center gap-1 border border-[#2c3444] text-[10px] font-semibold"
                               title={`View ${trade.screenshots.length} screenshot${trade.screenshots.length > 1 ? 's (with slide option)' : ''}`}
                             >
                               <ImageIcon className="w-3 h-3" />
@@ -345,7 +351,7 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({ trades }) 
                                   e.stopPropagation();
                                   openGallery(trade, 0);
                                 }}
-                                className="px-2 py-1 rounded bg-[#1e2430] hover:bg-[#2b3345] text-blue-400 hover:text-blue-300 transition-colors inline-flex items-center justify-center gap-1.5 border border-blue-500/20"
+                                className="px-2 py-1 rounded bg-[#1e2430] hover:bg-[#2b3345] text-slate-300 hover:text-white transition-colors inline-flex items-center justify-center gap-1.5 border border-[#2d3647]"
                                 title={`View ${trade.screenshots.length} screenshot${trade.screenshots.length > 1 ? 's (with slide option)' : ''}`}
                               >
                                 <ImageIcon className="w-3.5 h-3.5" />
@@ -407,7 +413,7 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({ trades }) 
                                       e.stopPropagation();
                                       openGallery(trade, 0);
                                     }}
-                                    className="text-xs text-blue-400 hover:text-blue-300 hover:underline flex items-center gap-1.5 font-medium"
+                                    className="text-xs text-slate-300 hover:text-white hover:underline flex items-center gap-1.5 font-medium"
                                   >
                                     <ImageIcon className="w-3.5 h-3.5" />
                                     <span>Screenshots ({trade.screenshots.length})</span>
@@ -517,7 +523,7 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({ trades }) 
                     </span>
                   )}
                   {hasMultiple && (
-                    <span className="px-2 py-0.5 rounded-full bg-blue-500/15 border border-blue-500/30 text-blue-400 text-[11px] font-semibold whitespace-nowrap">
+                    <span className="px-2 py-0.5 rounded-full bg-[#1e232e] border border-[#2e3646] text-slate-300 text-[11px] font-semibold whitespace-nowrap">
                       {galleryState.currentIndex + 1} / {totalCount}
                     </span>
                   )}
@@ -528,7 +534,7 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({ trades }) 
                     href={currentScreenshot.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-blue-400 hover:text-blue-300 hover:underline flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#1a1f2c] border border-blue-500/20 transition-colors"
+                    className="text-xs text-slate-300 hover:text-white hover:underline flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#1a1f2c] border border-[#2e3646] transition-colors"
                     title="Open full resolution in new tab"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -550,7 +556,7 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({ trades }) 
                 {hasMultiple && (
                   <button
                     onClick={prevSlide}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 z-20 p-2.5 sm:p-3 rounded-full bg-black/70 hover:bg-black/90 text-white/80 hover:text-white border border-white/10 hover:border-blue-500/50 backdrop-blur transition-all shadow-xl hover:scale-105 active:scale-95"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 z-20 p-2.5 sm:p-3 rounded-full bg-black/70 hover:bg-black/90 text-white/80 hover:text-white border border-white/10 hover:border-slate-400/50 backdrop-blur transition-all shadow-xl hover:scale-105 active:scale-95"
                     title="Previous slide (← Left arrow)"
                     aria-label="Previous slide"
                   >
@@ -576,7 +582,7 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({ trades }) 
                 {hasMultiple && (
                   <button
                     onClick={nextSlide}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 z-20 p-2.5 sm:p-3 rounded-full bg-black/70 hover:bg-black/90 text-white/80 hover:text-white border border-white/10 hover:border-blue-500/50 backdrop-blur transition-all shadow-xl hover:scale-105 active:scale-95"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 z-20 p-2.5 sm:p-3 rounded-full bg-black/70 hover:bg-black/90 text-white/80 hover:text-white border border-white/10 hover:border-slate-400/50 backdrop-blur transition-all shadow-xl hover:scale-105 active:scale-95"
                     title="Next slide (→ Right arrow)"
                     aria-label="Next slide"
                   >
@@ -598,7 +604,7 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({ trades }) 
                           onClick={() => goToSlide(idx)}
                           className={`relative rounded-lg overflow-hidden border transition-all shrink-0 w-16 h-12 sm:w-20 sm:h-14 bg-black/40 ${
                             isActive
-                              ? 'ring-2 ring-blue-500 border-blue-400 opacity-100 scale-105'
+                              ? 'ring-2 ring-slate-400 border-slate-300 opacity-100 scale-105'
                               : 'border-[#222836] opacity-50 hover:opacity-90 hover:border-slate-500'
                           }`}
                           title={`Slide ${idx + 1}: ${s.name}`}
@@ -611,7 +617,7 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({ trades }) 
                           <span
                             className={`absolute bottom-0.5 right-0.5 text-[9px] font-mono font-bold px-1 rounded ${
                               isActive
-                                ? 'bg-blue-600 text-white'
+                                ? 'bg-[#2b3240] text-white'
                                 : 'bg-black/70 text-slate-300'
                             }`}
                           >
@@ -631,7 +637,7 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({ trades }) 
                           onClick={() => goToSlide(idx)}
                           className={`h-1.5 rounded-full transition-all ${
                             idx === galleryState.currentIndex
-                              ? 'w-6 bg-blue-500'
+                              ? 'w-6 bg-slate-300'
                               : 'w-2 bg-slate-600 hover:bg-slate-400'
                           }`}
                           title={`Go to slide ${idx + 1}`}

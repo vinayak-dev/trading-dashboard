@@ -1,18 +1,28 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react';
 import { Sidebar, DashboardTab } from './components/Sidebar';
 import { Header } from './components/Header';
 import { FilterBar } from './components/FilterBar';
 import { TopOverviewCharts } from './components/TopOverviewCharts';
 import { KPISixCards } from './components/KPISixCards';
 import { ExpectancyProfitFactorSection } from './components/ExpectancyProfitFactorSection';
-import { ProfitLossSection } from './components/ProfitLossSection';
-import { WinnersLosersSection } from './components/WinnersLosersSection';
-import { PerformanceCalendarSection } from './components/PerformanceCalendarSection';
 import { RecentTradesTable } from './components/RecentTradesTable';
 import { TradeFrequencySection } from './components/TradeFrequencySection';
-import { DrawdownSection } from './components/DrawdownSection';
-import { BacktestSection } from './components/backtest/BacktestSection';
-import { NotionConnectionModal } from './components/NotionConnectionModal';
+import { TradeOutcomesStreakSection } from './components/TradeOutcomesStreakSection';
+
+// Code-split secondary tabs and modal to minimize initial bundle size and startup time
+const ProfitLossSection = lazy(() => import('./components/ProfitLossSection').then(m => ({ default: m.ProfitLossSection })));
+const WinnersLosersSection = lazy(() => import('./components/WinnersLosersSection').then(m => ({ default: m.WinnersLosersSection })));
+const DrawdownSection = lazy(() => import('./components/DrawdownSection').then(m => ({ default: m.DrawdownSection })));
+const PerformanceCalendarSection = lazy(() => import('./components/PerformanceCalendarSection').then(m => ({ default: m.PerformanceCalendarSection })));
+const BacktestSection = lazy(() => import('./components/backtest/BacktestSection').then(m => ({ default: m.BacktestSection })));
+const NotionConnectionModal = lazy(() => import('./components/NotionConnectionModal').then(m => ({ default: m.NotionConnectionModal })));
+
+const TabLoadingFallback = () => (
+  <div className="py-24 flex flex-col items-center justify-center space-y-3 text-slate-400">
+    <div className="w-7 h-7 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+    <span className="text-xs font-mono text-slate-500">Loading module...</span>
+  </div>
+);
 
 import {
   TradeRecord,
@@ -35,6 +45,29 @@ export function App() {
   const [activeTab, setActiveTab] = useState<DashboardTab>('overview');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
+
+  // Theme state ('dark' | 'light')
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    const saved = localStorage.getItem('theme');
+    if (saved === 'light' || saved === 'dark') return saved;
+    return 'dark';
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+      root.classList.remove('light');
+    } else {
+      root.classList.remove('dark');
+      root.classList.add('light');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
 
   const [trades, setTrades] = useState<TradeRecord[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -101,30 +134,41 @@ export function App() {
     return calculateKPIMetrics(filteredTrades);
   }, [filteredTrades]);
 
-  // 3. Compute Equity Curve
+  // 3. Compute Equity Curve (only needed on overview and pnl)
   const equityPoints = useMemo(() => {
+    if (activeTab !== 'overview' && activeTab !== 'pnl') return [];
     return generateEquityCurve(filteredTrades);
-  }, [filteredTrades]);
+  }, [filteredTrades, activeTab]);
 
   // 4. Generate Monthly and Daily distributions for Overview
   const monthlyPerfData = useMemo(() => {
+    if (activeTab !== 'overview') return [];
     return generateBilateralMonthlyPerformance(filteredTrades);
-  }, [filteredTrades]);
+  }, [filteredTrades, activeTab]);
 
   const dailyPerfData = useMemo(() => {
+    if (activeTab !== 'overview') return [];
     return generateDailyPerformance(filteredTrades);
-  }, [filteredTrades]);
+  }, [filteredTrades, activeTab]);
 
   const tradeFrequencyStats = useMemo(() => {
+    if (activeTab !== 'overview') {
+      return {
+        daily: { data: [], avg: 0 },
+        weekly: { data: [], avg: 0 },
+        monthly: { data: [], avg: 0 },
+      };
+    }
     return calculateTradeFrequency(filteredTrades);
-  }, [filteredTrades]);
+  }, [filteredTrades, activeTab]);
 
   const drawdownAnalytics = useMemo(() => {
+    if (activeTab !== 'drawdown') return null;
     return calculateDrawdownAnalytics(filteredTrades, 50000);
-  }, [filteredTrades]);
+  }, [filteredTrades, activeTab]);
 
   return (
-    <div className="min-h-screen bg-[#07080b] text-slate-100 flex font-sans selection:bg-blue-500/30 selection:text-blue-200">
+    <div className="min-h-screen bg-[#07080b] text-slate-100 flex font-sans selection:bg-white/15 selection:text-slate-100">
       {/* Left Navigation Sidebar */}
       <Sidebar
         activeTab={activeTab}
@@ -138,6 +182,9 @@ export function App() {
         error={error}
         databaseId={apiResponse?.databaseId}
         onOpenDiagnostics={() => setIsDiagnosticsOpen(true)}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        onSetTheme={setTheme}
       />
 
       {/* Main Content Area */}
@@ -156,6 +203,8 @@ export function App() {
           onOpenDiagnostics={() => setIsDiagnosticsOpen(true)}
           activeTab={activeTab}
           onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)}
+          theme={theme}
+          onToggleTheme={toggleTheme}
         />
 
         {/* Global Filter Bar (Live/Demo Notion) */}
@@ -178,6 +227,12 @@ export function App() {
               {/* Middle Row: 6 KPI Cards (Total PnL, Win Rate, Risk/Reward, Month Gain, Week Gain, Daily Gain) */}
               <KPISixCards metrics={kpiMetrics} />
 
+              {/* Current Streak */}
+              <TradeOutcomesStreakSection
+                trades={filteredTrades}
+                metrics={kpiMetrics}
+              />
+
               {/* Expectancy & Profit Factor Section */}
               <ExpectancyProfitFactorSection
                 trades={filteredTrades}
@@ -192,40 +247,57 @@ export function App() {
             </div>
           )}
 
-          {/* TAB 2: PROFIT & LOSS + WINNERS & LOSERS */}
+          {/* TAB 2: TRADES (Only Trades Rows) */}
+          {activeTab === 'trades' && (
+            <div className="animate-in fade-in duration-200">
+              <RecentTradesTable trades={filteredTrades} title="Trades" defaultPageSize={15} />
+            </div>
+          )}
+
+          {/* TAB 3: PROFIT & LOSS + WINNERS & LOSERS */}
           {activeTab === 'pnl' && (
-            <div className="space-y-6 animate-in fade-in duration-200">
-              <ProfitLossSection metrics={kpiMetrics} equityPoints={equityPoints} />
-              <WinnersLosersSection metrics={kpiMetrics} />
-            </div>
+            <Suspense fallback={<TabLoadingFallback />}>
+              <div className="space-y-6 animate-in fade-in duration-200">
+                <ProfitLossSection metrics={kpiMetrics} equityPoints={equityPoints} />
+                <WinnersLosersSection metrics={kpiMetrics} />
+              </div>
+            </Suspense>
           )}
 
-          {/* TAB 3: DRAW DOWN */}
-          {activeTab === 'drawdown' && (
-            <div className="space-y-6 animate-in fade-in duration-200">
-              <DrawdownSection
-                analytics={drawdownAnalytics}
-                onNavigateTab={(tab) => setActiveTab(tab as DashboardTab)}
-              />
-            </div>
+          {/* TAB 4: DRAW DOWN */}
+          {activeTab === 'drawdown' && drawdownAnalytics && (
+            <Suspense fallback={<TabLoadingFallback />}>
+              <div className="space-y-6 animate-in fade-in duration-200">
+                <DrawdownSection
+                  analytics={drawdownAnalytics}
+                  onNavigateTab={(tab) => setActiveTab(tab as DashboardTab)}
+                />
+              </div>
+            </Suspense>
           )}
 
-          {/* TAB 4: CALENDAR */}
+          {/* TAB 5: CALENDAR */}
           {activeTab === 'calendar' && (
-            <div className="space-y-6 animate-in fade-in duration-200">
-              <PerformanceCalendarSection trades={filteredTrades} initialBalance={50000} />
-            </div>
+            <Suspense fallback={<TabLoadingFallback />}>
+              <div className="space-y-6 animate-in fade-in duration-200">
+                <PerformanceCalendarSection trades={filteredTrades} initialBalance={50000} />
+              </div>
+            </Suspense>
           )}
 
-          {/* TAB 5: BACKTEST LAB */}
-          {activeTab === 'backtest' && <BacktestSection />}
+          {/* TAB 6: BACKTEST LAB */}
+          {activeTab === 'backtest' && (
+            <Suspense fallback={<TabLoadingFallback />}>
+              <BacktestSection />
+            </Suspense>
+          )}
         </main>
 
         {/* Footer */}
         <footer className="border-t border-[#1f242e] py-6 px-4 text-center text-xs text-slate-500 mt-12 bg-[#090b0f]">
           <div className="w-full max-w-[90%] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
             <span>
-              Notion Trading Analytics • Built for NQ & ES Day Traders • Read-Only Notion API Integration
+              Notion Trading Analytics • Built for NQ &amp; ES Day Traders • Read-Only Notion API Integration
             </span>
             <span className="font-mono text-slate-600">
               Cloudflare Workers Static Assets • Edge Zero-Node Runtime
@@ -234,13 +306,17 @@ export function App() {
         </footer>
       </div>
 
-      {/* Notion Connection & Diagnostics Modal */}
-      <NotionConnectionModal
-        isOpen={isDiagnosticsOpen}
-        onClose={() => setIsDiagnosticsOpen(false)}
-        apiResponse={apiResponse}
-        mode={mode}
-      />
+      {/* Notion Connection & Diagnostics Modal (Lazy Loaded only when opened) */}
+      {isDiagnosticsOpen && (
+        <Suspense fallback={null}>
+          <NotionConnectionModal
+            isOpen={isDiagnosticsOpen}
+            onClose={() => setIsDiagnosticsOpen(false)}
+            apiResponse={apiResponse}
+            mode={mode}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }

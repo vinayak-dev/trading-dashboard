@@ -11,10 +11,13 @@ import {
   Sparkles,
   CheckCircle2,
   AlertCircle,
-  FlaskConical
+  FlaskConical,
+  ArrowLeftRight,
+  Sun,
+  Moon
 } from 'lucide-react';
 
-export type DashboardTab = 'overview' | 'pnl' | 'drawdown' | 'calendar' | 'backtest';
+export type DashboardTab = 'overview' | 'trades' | 'pnl' | 'drawdown' | 'calendar' | 'backtest';
 
 interface NavItem {
   id: DashboardTab;
@@ -36,6 +39,9 @@ interface SidebarProps {
   error: string | null;
   databaseId?: string;
   onOpenDiagnostics: () => void;
+  theme?: 'dark' | 'light';
+  onToggleTheme?: () => void;
+  onSetTheme?: (theme: 'dark' | 'light') => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -50,6 +56,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   error,
   databaseId,
   onOpenDiagnostics,
+  theme = 'dark',
+  onToggleTheme,
+  onSetTheme,
 }) => {
   const navItems: NavItem[] = [
     {
@@ -57,6 +66,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Overview',
       sublabel: '',
       icon: LayoutDashboard,
+    },
+    {
+      id: 'trades',
+      label: 'Trades',
+      sublabel: '',
+      badge: totalRecords > 0 ? String(totalRecords) : undefined,
+      icon: ArrowLeftRight,
     },
     {
       id: 'pnl',
@@ -135,17 +151,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onClick={() => handleSelectTab(item.id)}
               title={isCollapsed && !isOpenMobile ? `${item.label} (${item.sublabel})` : undefined}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all relative group ${isActive
-                ? 'bg-blue-600/15 text-blue-400 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.12)]'
+                ? 'bg-[#1a1e27] text-white border border-[#2e3544] shadow-sm'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-[#151922] border border-transparent'
                 } ${isCollapsed && !isOpenMobile ? 'justify-center px-2' : ''}`}
             >
               {/* Active Left Pill Indicator */}
               {isActive && (
-                <div className="absolute left-0 top-2 bottom-2 w-1 bg-blue-500 rounded-r-full" />
+                <div className="absolute left-0 top-2 bottom-2 w-1 bg-slate-300 rounded-r-full" />
               )}
 
               <Icon
-                className={`w-4 h-4 shrink-0 transition-colors ${isActive ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300'
+                className={`w-4 h-4 shrink-0 transition-colors ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-slate-300'
                   }`}
               />
 
@@ -160,7 +176,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     </div>
                   </div>
                   {item.badge && (
-                    <span className="text-[9px] font-bold font-mono px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 shrink-0">
+                    <span className="text-[9px] font-bold font-mono px-1.5 py-0.5 rounded bg-[#1e232e] text-slate-300 border border-[#2c3342] shrink-0">
                       {item.badge}
                     </span>
                   )}
@@ -219,22 +235,70 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
             )}
 
+            {/* Theme Switcher */}
+            <div className="pt-1.5 border-t border-[#1d2230]">
+              <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1.5 px-0.5">
+                <span>Theme</span>
+                <span className="capitalize font-mono text-[10px] text-slate-400">{theme} mode</span>
+              </div>
+              <div className="bg-[#191d26] border border-[#2b313e] rounded-xl p-1 flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => onSetTheme ? onSetTheme('dark') : onToggleTheme?.()}
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-[11px] font-semibold transition-all ${
+                    theme === 'dark'
+                      ? 'bg-[#12151d] text-white shadow-sm border border-[#3b4457]'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                  title="Switch to Dark Mode"
+                >
+                  <Moon className="w-3.5 h-3.5 text-slate-300" />
+                  <span>Dark</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onSetTheme ? onSetTheme('light') : onToggleTheme?.()}
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-[11px] font-semibold transition-all ${
+                    theme === 'light'
+                      ? 'bg-white text-slate-900 shadow-sm border border-slate-300'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                  title="Switch to Light Mode"
+                >
+                  <Sun className="w-3.5 h-3.5 text-amber-500" />
+                  <span>Light</span>
+                </button>
+              </div>
+            </div>
+
             <button
               onClick={onOpenDiagnostics}
               className="w-full mt-1 px-2.5 py-1.5 rounded-lg bg-[#1a1f2b] hover:bg-[#242b3b] text-slate-300 hover:text-white border border-[#2e374a] text-[11px] font-medium transition-colors flex items-center justify-center gap-1.5"
             >
-              <Database className="w-3 h-3 text-blue-400" />
+              <Database className="w-3 h-3 text-slate-400" />
               <span>Notion Settings</span>
             </button>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-2 py-1">
             <button
+              type="button"
+              onClick={() => onToggleTheme ? onToggleTheme() : onSetTheme?.(theme === 'dark' ? 'light' : 'dark')}
+              title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+              className="p-2 rounded-lg bg-[#151922] hover:bg-[#202636] text-slate-400 hover:text-white border border-[#232938] transition-colors"
+            >
+              {theme === 'dark' ? (
+                <Moon className="w-4 h-4 text-slate-300" />
+              ) : (
+                <Sun className="w-4 h-4 text-amber-500" />
+              )}
+            </button>
+            <button
               onClick={onOpenDiagnostics}
               title="Notion Settings & Schema"
               className="p-2 rounded-lg bg-[#151922] hover:bg-[#202636] text-slate-400 hover:text-white border border-[#232938] transition-colors"
             >
-              <Database className="w-4 h-4 text-blue-400" />
+              <Database className="w-4 h-4 text-slate-400" />
             </button>
           </div>
         )}

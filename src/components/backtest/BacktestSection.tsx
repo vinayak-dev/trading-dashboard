@@ -221,7 +221,7 @@ export const BacktestSection: React.FC = () => {
               ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-300'
               : notification.type === 'error'
               ? 'bg-rose-500/15 border border-rose-500/30 text-rose-300'
-              : 'bg-blue-500/15 border border-blue-500/30 text-blue-300'
+              : 'bg-[#1e232e] border border-[#2e3748] text-slate-300'
           }`}
         >
           <div className="flex items-center gap-2">
@@ -244,7 +244,7 @@ export const BacktestSection: React.FC = () => {
             <h1 className="text-base sm:text-lg font-bold text-white tracking-tight">
               Backtesting &amp; Strategy Lab
             </h1>
-            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#1e232e] text-slate-300 border border-[#2e3748]">
               IndexedDB Persistent
             </span>
           </div>
@@ -256,7 +256,7 @@ export const BacktestSection: React.FC = () => {
         <div className="flex items-center flex-wrap gap-2.5">
           <button
             onClick={() => setIsUploadModalOpen(true)}
-            className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white text-xs font-bold shadow-lg shadow-blue-600/25 transition-all flex items-center gap-2"
+            className="px-4 py-2 rounded-xl bg-[#242a36] hover:bg-[#2e3646] active:bg-[#384256] text-white text-xs font-bold border border-[#3d475c] transition-all flex items-center gap-2"
           >
             <Upload className="w-4 h-4" />
             <span>Upload Backtest Data</span>
@@ -278,7 +278,7 @@ export const BacktestSection: React.FC = () => {
             className="p-2 rounded-xl bg-[#191d28] hover:bg-[#232938] text-slate-400 hover:text-white border border-[#262c3b] transition-colors"
             title="Reload from local database"
           >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-blue-400' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-slate-300' : ''}`} />
           </button>
         </div>
       </div>
@@ -286,13 +286,13 @@ export const BacktestSection: React.FC = () => {
       {/* Main Content Area */}
       {isLoading ? (
         <div className="p-16 text-center text-slate-400 space-y-3">
-          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto" />
+          <div className="w-8 h-8 border-2 border-slate-400 border-t-transparent rounded-full animate-spin mx-auto" />
           <div className="text-xs font-mono">Loading backtest trades from IndexedDB...</div>
         </div>
       ) : trades.length === 0 ? (
         /* Empty State */
         <div className="bg-[#12141a] border border-[#1f242e] rounded-2xl p-10 sm:p-16 text-center space-y-5">
-          <div className="w-16 h-16 rounded-2xl bg-[#181c28] border border-[#283144] flex items-center justify-center text-blue-400 mx-auto shadow-xl">
+          <div className="w-16 h-16 rounded-2xl bg-[#181c28] border border-[#283144] flex items-center justify-center text-slate-300 mx-auto shadow-xl">
             <FileSpreadsheet className="w-8 h-8" />
           </div>
 
@@ -306,7 +306,7 @@ export const BacktestSection: React.FC = () => {
           <div className="flex items-center justify-center gap-3 pt-2">
             <button
               onClick={() => setIsUploadModalOpen(true)}
-              className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-lg shadow-blue-600/30 transition-all flex items-center gap-2"
+              className="px-5 py-2.5 rounded-xl bg-[#242a36] hover:bg-[#2e3646] text-white text-xs font-bold border border-[#3d475c] transition-all flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
               <span>Upload Backtest CSV</span>

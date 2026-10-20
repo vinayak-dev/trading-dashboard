@@ -16,7 +16,8 @@ import {
   filterTrades,
   resolveRealizedR,
   calculateTradeFrequency,
-  calculateDrawdownAnalytics
+  calculateDrawdownAnalytics,
+  calculateStreakStats
 } from '../src/lib/calculations';
 import { DEMO_TRADES, DEMO_TRADES_BASE_10 } from '../src/lib/demo-data';
 import { mapNotionPageToTrade } from '../src/lib/notion-mapper';
@@ -561,6 +562,44 @@ describe('Quantitative Trading Calculations Module', () => {
       expect(dd.maxDrawdownPct).toBe(0);
       expect(dd.maxDrawdownDollar).toBe(0);
       expect(dd.avgDrawdownPct).toBe(0);
+    });
+  });
+
+  describe('StreakStats & Trade Outcomes Calculation', () => {
+    it('calculates win, loss, and current active streak correctly', () => {
+      const trades: TradeRecord[] = [
+        { id: '1', date: '2026-06-01', isExecutedTrade: true, result: 'Win' } as any,
+        { id: '2', date: '2026-06-02', isExecutedTrade: true, result: 'Win' } as any,
+        { id: '3', date: '2026-06-03', isExecutedTrade: true, result: 'Loss' } as any,
+        { id: '4', date: '2026-06-04', isExecutedTrade: true, result: 'Win' } as any,
+        { id: '5', date: '2026-06-05', isExecutedTrade: true, result: 'Win' } as any,
+        { id: '6', date: '2026-06-06', isExecutedTrade: true, result: 'Win' } as any,
+      ];
+
+      const stats = calculateStreakStats(trades);
+      expect(stats.maxConsecutiveWins).toBe(3);
+      expect(stats.maxConsecutiveLosses).toBe(1);
+      expect(stats.currentStreak).toEqual({ type: 'win', count: 3 });
+    });
+
+    it('calculates current losing streak when latest trades are losses', () => {
+      const trades: TradeRecord[] = [
+        { id: '1', date: '2026-06-01', isExecutedTrade: true, result: 'Win' } as any,
+        { id: '2', date: '2026-06-02', isExecutedTrade: true, result: 'Loss' } as any,
+        { id: '3', date: '2026-06-03', isExecutedTrade: true, result: 'Loss' } as any,
+      ];
+
+      const stats = calculateStreakStats(trades);
+      expect(stats.maxConsecutiveWins).toBe(1);
+      expect(stats.maxConsecutiveLosses).toBe(2);
+      expect(stats.currentStreak).toEqual({ type: 'loss', count: 2 });
+    });
+
+    it('handles empty trades gracefully', () => {
+      const stats = calculateStreakStats([]);
+      expect(stats.maxConsecutiveWins).toBe(0);
+      expect(stats.maxConsecutiveLosses).toBe(0);
+      expect(stats.currentStreak).toEqual({ type: 'none', count: 0 });
     });
   });
 });

@@ -10,7 +10,10 @@ import {
   TrendingUp,
   TrendingDown,
   CalendarDays,
-  FlaskConical
+  FlaskConical,
+  ArrowLeftRight,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { FilterState } from '../types/trade';
 import { DashboardTab } from './Sidebar';
@@ -30,6 +33,8 @@ interface HeaderProps {
   onOpenDiagnostics: () => void;
   activeTab: DashboardTab;
   onOpenMobileSidebar?: () => void;
+  theme?: 'dark' | 'light';
+  onToggleTheme?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -45,6 +50,8 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenDiagnostics,
   activeTab,
   onOpenMobileSidebar,
+  theme = 'dark',
+  onToggleTheme,
 }) => {
   const formatTime = (date: Date | null) => {
     if (!date) return 'Never';
@@ -67,6 +74,8 @@ export const Header: React.FC<HeaderProps> = ({
     switch (tab) {
       case 'overview':
         return { label: 'Overview', icon: LayoutDashboard };
+      case 'trades':
+        return { label: 'Trades Journal', icon: ArrowLeftRight };
       case 'pnl':
         return { label: 'Profit & Loss', icon: TrendingUp };
       case 'drawdown':
@@ -104,7 +113,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <div>
             <div className="flex items-center gap-2">
-              <CurrentIcon className="w-4 h-4 text-blue-400" />
+              <CurrentIcon className="w-4 h-4 text-slate-300" />
               <h2 className="text-base sm:text-lg font-bold tracking-tight text-white">
                 {currentTab.label}
               </h2>
@@ -132,7 +141,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={() => onToggleMode('live')}
               className={`px-2.5 sm:px-3 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1.5 ${mode === 'live'
-                ? 'bg-blue-600/20 text-blue-400 border border-blue-500/40 shadow-sm'
+                ? 'bg-[#1e232e] text-slate-200 border border-[#323b4c] shadow-sm'
                 : 'text-slate-400 hover:text-slate-200'
                 }`}
             >
@@ -196,11 +205,11 @@ export const Header: React.FC<HeaderProps> = ({
             disabled={isLoading}
             className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${isLoading
               ? 'bg-slate-800/60 text-slate-500 border-slate-700/40 cursor-not-allowed'
-              : 'bg-[#191d26] hover:bg-[#252c3b] active:bg-[#2e374a] text-slate-200 border-[#2b313e] hover:border-blue-500/50 shadow-sm'
+              : 'bg-[#191d26] hover:bg-[#252c3b] active:bg-[#2e374a] text-slate-200 border-[#2b313e] hover:border-slate-500/50 shadow-sm'
               }`}
             title="Fetch latest updates from Notion"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-blue-400' : 'text-slate-400'}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-slate-300' : 'text-slate-400'}`} />
             <span className="hidden sm:inline">{isLoading ? 'Fetching...' : 'Refresh'}</span>
           </button>
 
@@ -212,6 +221,22 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <Database className="w-4 h-4" />
           </button>
+
+          {/* Dark / Light Theme Toggle */}
+          {onToggleTheme && (
+            <button
+              onClick={onToggleTheme}
+              className="p-1.5 rounded-lg bg-[#191d26] hover:bg-[#252c3b] text-slate-400 hover:text-white border border-[#2b313e] transition-colors"
+              title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? (
+                <Moon className="w-4 h-4 text-slate-300" />
+              ) : (
+                <Sun className="w-4 h-4 text-amber-500" />
+              )}
+            </button>
+          )}
         </div>
       </div>
     </header>

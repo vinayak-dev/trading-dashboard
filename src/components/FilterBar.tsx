@@ -179,7 +179,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                       onClick={() => toggleArrayFilter('tickers', ticker)}
                       className={`px-2.5 py-1 text-xs rounded border transition-colors font-mono ${
                         active
-                          ? 'bg-blue-600/20 border-blue-500 text-blue-300 font-semibold'
+                          ? 'bg-[#222835] border-[#384254] text-white font-semibold'
                           : 'bg-[#141c2c] border-[#1f2b42] text-slate-400 hover:text-slate-200'
                       }`}
                     >

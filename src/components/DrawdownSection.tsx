@@ -105,7 +105,7 @@ export const DrawdownSection: React.FC<DrawdownSectionProps> = ({
             {/* How this works link */}
             <button
               onClick={() => setShowHowItWorks(true)}
-              className="text-xs text-blue-400 hover:text-blue-300 hover:underline transition-colors flex items-center gap-1"
+              className="text-xs text-slate-300 hover:text-white hover:underline transition-colors flex items-center gap-1"
             >
               <HelpCircle className="w-3.5 h-3.5" />
               <span>How this works?</span>

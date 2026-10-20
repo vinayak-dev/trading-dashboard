@@ -42,8 +42,8 @@ export const TopOverviewCharts: React.FC<TopOverviewChartsProps> = ({
             <AreaChart data={equityPoints} margin={{ top: 8, right: 8, left: -18, bottom: 0 }}>
               <defs>
                 <linearGradient id="miniEquityGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#0084ff" stopOpacity={0.35} />
-                  <stop offset="95%" stopColor="#0084ff" stopOpacity={0.0} />
+                  <stop offset="5%" stopColor="#94a3b8" stopOpacity={0.25} />
+                  <stop offset="95%" stopColor="#94a3b8" stopOpacity={0.0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#1d222c" />
@@ -68,7 +68,7 @@ export const TopOverviewCharts: React.FC<TopOverviewChartsProps> = ({
                     return (
                       <div className="bg-[#101217] border border-[#232834] p-2 rounded-lg text-xs font-mono shadow-xl">
                         <span className="text-slate-400 block">{pt.date}</span>
-                        <span className="font-bold text-cyan-400">
+                        <span className="font-bold text-slate-100">
                           ${pt.accountBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                         </span>
                       </div>
@@ -80,11 +80,11 @@ export const TopOverviewCharts: React.FC<TopOverviewChartsProps> = ({
               <Area
                 type="monotone"
                 dataKey="accountBalance"
-                stroke="#0084ff"
+                stroke="#cbd5e1"
                 strokeWidth={2}
                 fill="url(#miniEquityGradient)"
-                dot={{ stroke: '#0084ff', strokeWidth: 2, r: 2.5, fill: '#ffffff' }}
-                activeDot={{ r: 4.5, stroke: '#ffffff', strokeWidth: 2, fill: '#0084ff' }}
+                dot={{ stroke: '#94a3b8', strokeWidth: 2, r: 2.5, fill: '#12141a' }}
+                activeDot={{ r: 4.5, stroke: '#ffffff', strokeWidth: 2, fill: '#94a3b8' }}
               />
             </AreaChart>
           </ResponsiveContainer>
@@ -159,9 +159,13 @@ export const TopOverviewCharts: React.FC<TopOverviewChartsProps> = ({
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={dailyData} margin={{ top: 8, right: 8, left: -18, bottom: 20 }}>
               <defs>
-                <linearGradient id="dailyBlueBar" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#0084ff" stopOpacity={0.95} />
-                  <stop offset="100%" stopColor="#0055b3" stopOpacity={0.7} />
+                <linearGradient id="dailyBar" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#94a3b8" stopOpacity={0.95} />
+                  <stop offset="100%" stopColor="#64748b" stopOpacity={0.7} />
+                </linearGradient>
+                <linearGradient id="dailyBarNegative" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#64748b" stopOpacity={0.7} />
+                  <stop offset="100%" stopColor="#475569" stopOpacity={0.95} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#1d222c" />
@@ -189,7 +193,7 @@ export const TopOverviewCharts: React.FC<TopOverviewChartsProps> = ({
                     return (
                       <div className="bg-[#101217] border border-[#232834] p-2 rounded-lg text-xs font-mono shadow-xl">
                         <span className="text-slate-300 block mb-0.5">{d.day}</span>
-                        <span className={d.pnl >= 0 ? 'text-cyan-400 font-bold' : 'text-rose-400 font-bold'}>
+                        <span className={d.pnl >= 0 ? 'text-slate-100 font-bold' : 'text-slate-400 font-bold'}>
                           {d.pnl >= 0 ? '+' : ''}${d.pnl.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                         </span>
                       </div>
@@ -199,11 +203,11 @@ export const TopOverviewCharts: React.FC<TopOverviewChartsProps> = ({
                 }}
               />
               <ReferenceLine y={0} stroke="#2e3644" />
-              <Bar dataKey="pnl" fill="url(#dailyBlueBar)" radius={[4, 4, 0, 0]} barSize={22}>
+              <Bar dataKey="pnl" fill="url(#dailyBar)" radius={[4, 4, 0, 0]} barSize={22}>
                 {dailyData.map((entry, index) => (
                   <Cell
                     key={`daily-cell-${index}`}
-                    fill={entry.pnl < 0 ? '#0066cc' : 'url(#dailyBlueBar)'}
+                    fill={entry.pnl < 0 ? 'url(#dailyBarNegative)' : 'url(#dailyBar)'}
                   />
                 ))}
               </Bar>
