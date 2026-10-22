@@ -30,7 +30,7 @@ export const PerformanceCalendarSection: React.FC<PerformanceCalendarSectionProp
 }) => {
   const [metric, setMetric] = useState<MetricType>('r');
   const [balanceRef, setBalanceRef] = useState<BalanceType>('initial');
-  const [viewType, setViewType] = useState<ViewType>('year');
+  const [viewType, setViewType] = useState<ViewType>('month');
 
   // Real-world current date for defaults
   const now = new Date();
@@ -38,19 +38,8 @@ export const PerformanceCalendarSection: React.FC<PerformanceCalendarSectionProp
   const currentRealYear = now.getFullYear();
   const todayStr = `${currentRealYear}-${String(currentRealMonth + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
-  // Default year to most recent trade date if available (e.g. 2025 in demo trades)
-  const defaultYear = useMemo(() => {
-    for (let i = trades.length - 1; i >= 0; i--) {
-      if (trades[i].date) {
-        const y = parseInt(trades[i].date!.split('-')[0], 10);
-        if (!isNaN(y)) return y;
-      }
-    }
-    return currentRealYear;
-  }, [trades, currentRealYear]);
-
-  const [currentMonth, setCurrentMonth] = useState<number>(11); // December by default for demo
-  const [currentYear, setCurrentYear] = useState<number>(defaultYear);
+  const [currentMonth, setCurrentMonth] = useState<number>(currentRealMonth);
+  const [currentYear, setCurrentYear] = useState<number>(currentRealYear);
 
   // Month & Year Popup states
   const [isMonthPickerOpen, setIsMonthPickerOpen] = useState(false);
@@ -68,7 +57,7 @@ export const PerformanceCalendarSection: React.FC<PerformanceCalendarSectionProp
     years.add(2025);
     years.add(2026);
     trades.forEach((t) => {
-      if (t.date) {
+      if (t.date && t.isExecutedTrade !== false && t.result !== 'No Trade') {
         const y = parseInt(t.date.split('-')[0], 10);
         if (!isNaN(y)) years.add(y);
       }
@@ -76,11 +65,13 @@ export const PerformanceCalendarSection: React.FC<PerformanceCalendarSectionProp
     return Array.from(years).sort((a, b) => a - b);
   }, [trades, currentRealYear]);
 
-  // Group trades by date string "YYYY-MM-DD"
+  // Group executed trades by date string "YYYY-MM-DD" (excludes No Trade / non-executed days)
   const tradesByDate = useMemo(() => {
     const map = new Map<string, TradeRecord[]>();
     trades.forEach((t) => {
       if (!t.date) return;
+      // Exclude "No Trade" and non-executed records so no-trade days remain empty
+      if (t.result === 'No Trade' || t.isExecutedTrade === false) return;
       const existing = map.get(t.date) || [];
       existing.push(t);
       map.set(t.date, existing);
@@ -248,12 +239,17 @@ export const PerformanceCalendarSection: React.FC<PerformanceCalendarSectionProp
   }, [yearMonthsData, initialBalance]);
 
   const formatValue = (dayTrades: TradeRecord[]) => {
-    if (dayTrades.length === 0) return null;
-    const pnl = dayTrades.reduce(
+    if (!dayTrades || dayTrades.length === 0) return null;
+    const executedTrades = dayTrades.filter(
+      (t) => t.isExecutedTrade !== false && t.result !== 'No Trade'
+    );
+    if (executedTrades.length === 0) return null;
+
+    const pnl = executedTrades.reduce(
       (sum, t) => sum + ((t.dollarPnl ?? t.pnlDollar) ?? (t.realizedR !== null ? t.realizedR * 500 : 0)),
       0
     );
-    const r = dayTrades.reduce((sum, t) => sum + (t.realizedR ?? 0), 0);
+    const r = executedTrades.reduce((sum, t) => sum + (t.realizedR ?? 0), 0);
 
     if (metric === 'dollar') {
       const formatted = Math.abs(pnl).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });

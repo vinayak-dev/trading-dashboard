@@ -15,7 +15,7 @@ export const CalendarActivityRow: React.FC<CalendarActivityRowProps> = ({
 }) => {
   // Compute monthly calendar data
   const calendarData = useMemo(() => {
-    const executed = trades.filter((t) => t.isExecutedTrade && t.date);
+    const executed = trades.filter((t) => t.isExecutedTrade && t.result !== 'No Trade' && t.date);
     if (executed.length === 0) {
       const now = new Date();
       const year = now.getFullYear();
