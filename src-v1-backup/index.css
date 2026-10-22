@@ -1,0 +1,265 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background-color: #07080b;
+  color: #f1f5f9;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0b0c10;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e222a;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2b313d;
+}
+
+/* Recharts styling overrides matching screenshot */
+.recharts-default-tooltip {
+  background-color: #12151b !important;
+  border: 1px solid #232834 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 14px 30px -5px rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Remove default white/light cursor highlight across all charts */
+.recharts-tooltip-cursor,
+rect.recharts-tooltip-cursor,
+path.recharts-tooltip-cursor {
+  fill: transparent !important;
+  fill-opacity: 0 !important;
+}
+
+.recharts-cartesian-grid line {
+  stroke: #1f242e !important;
+  stroke-dasharray: 4 4;
+}
+
+.recharts-text {
+  fill: #737c8c !important;
+  font-size: 11px;
+}
+
+/* ==========================================================================
+   LIGHT MODE OVERRIDES
+   Activates when html element has 'light' class and lacks 'dark'
+   ========================================================================== */
+
+html.light {
+  color-scheme: light;
+}
+
+html.light body {
+  background-color: #f6f8fb;
+  color: #0f172a;
+}
+
+/* Base backgrounds */
+html.light .bg-\[\#07080b\] {
+  background-color: #f6f8fb !important;
+}
+
+html.light .bg-\[\#08090d\],
+html.light .bg-\[\#080b11\],
+html.light .bg-\[\#090b0f\],
+html.light .bg-\[\#0b101c\] {
+  background-color: #eef2f6 !important;
+}
+
+/* Sidebar & Header */
+html.light .bg-\[\#0c0e14\] {
+  background-color: #ffffff !important;
+}
+
+html.light .bg-\[\#0c0e14\]\/95 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Card & Surface Backgrounds */
+html.light .bg-\[\#101217\],
+html.light .bg-\[\#101319\],
+html.light .bg-\[\#10141f\],
+html.light .bg-\[\#111726\],
+html.light .bg-\[\#12141a\],
+html.light .bg-\[\#12141c\],
+html.light .bg-\[\#12151b\],
+html.light .bg-\[\#12151d\],
+html.light .bg-\[\#13161f\],
+html.light .bg-\[\#141721\],
+html.light .bg-\[\#15171f\],
+html.light .bg-\[\#0e1015\],
+html.light .bg-\[\#0e1118\],
+html.light .bg-\[\#0f1118\],
+html.light .bg-\[\#0f1422\],
+html.light .bg-\[\#0f172a\],
+html.light .bg-\[\#0f1922\],
+html.light .bg-\[\#0f1a1c\],
+html.light .bg-\[\#0f1b1c\] {
+  background-color: #ffffff !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+}
+
+/* Sub-card, inner elements, pills & buttons */
+html.light .bg-\[\#131620\],
+html.light .bg-\[\#141b2b\],
+html.light .bg-\[\#141b2c\],
+html.light .bg-\[\#141c2c\],
+html.light .bg-\[\#151922\],
+html.light .bg-\[\#151c2d\],
+html.light .bg-\[\#161a23\],
+html.light .bg-\[\#161f33\],
+html.light .bg-\[\#171a22\],
+html.light .bg-\[\#181b22\],
+html.light .bg-\[\#182338\],
+html.light .bg-\[\#191d26\],
+html.light .bg-\[\#192237\],
+html.light .bg-\[\#1a1f2b\],
+html.light .bg-\[\#1a1f2c\],
+html.light .bg-\[\#1b253b\],
+html.light .bg-\[\#1c263d\],
+html.light .bg-\[\#1e232d\],
+html.light .bg-\[\#1e2430\],
+html.light .bg-\[\#1e2433\],
+html.light .bg-\[\#202635\],
+html.light .bg-\[\#222a3a\],
+html.light .bg-\[\#242b3b\],
+html.light .bg-\[\#252c38\],
+html.light .bg-\[\#252c3b\],
+html.light .bg-\[\#2b3345\] {
+  background-color: #f1f5f9 !important;
+}
+
+/* Borders */
+html.light .border-\[\#1f242e\],
+html.light .border-\[\#232938\],
+html.light .border-\[\#212631\],
+html.light .border-\[\#2b313e\],
+html.light .border-\[\#2e374a\],
+html.light .border-\[\#1d2230\],
+html.light .border-\[\#232834\],
+html.light .border-\[\#191d26\],
+html.light .border-\[\#1f2a40\],
+html.light .border-\[\#172033\],
+html.light .border-\[\#171a22\] {
+  border-color: #e2e8f0 !important;
+}
+
+html.light .divide-\[\#171a22\] > :not([hidden]) ~ :not([hidden]),
+html.light .divide-\[\#1f242e\] > :not([hidden]) ~ :not([hidden]) {
+  border-color: #e2e8f0 !important;
+}
+
+/* Text Colors */
+html.light .text-white {
+  color: #0f172a !important;
+}
+
+html.light .text-slate-100,
+html.light .text-slate-200 {
+  color: #1e293b !important;
+}
+
+html.light .text-slate-300 {
+  color: #334155 !important;
+}
+
+html.light .text-slate-400 {
+  color: #64748b !important;
+}
+
+html.light .text-slate-500 {
+  color: #64748b !important;
+}
+
+html.light .text-slate-600 {
+  color: #94a3b8 !important;
+}
+
+/* Inputs, Textareas, Selects */
+html.light input,
+html.light select,
+html.light textarea {
+  color: #0f172a !important;
+}
+
+html.light input::placeholder,
+html.light textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Hover States */
+html.light .hover\:bg-\[\#151922\]:hover,
+html.light .hover\:bg-\[\#161a23\]:hover,
+html.light .hover\:bg-\[\#1a1f2b\]:hover,
+html.light .hover\:bg-\[\#1a1f2c\]:hover,
+html.light .hover\:bg-\[\#202636\]:hover,
+html.light .hover\:bg-\[\#242b3b\]:hover,
+html.light .hover\:bg-\[\#252c3b\]:hover {
+  background-color: #e2e8f0 !important;
+}
+
+html.light .hover\:text-white:hover {
+  color: #0f172a !important;
+}
+
+html.light .hover\:text-slate-200:hover {
+  color: #1e293b !important;
+}
+
+/* Scrollbars in Light Mode */
+html.light ::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+html.light ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}
+
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Recharts in Light Mode */
+html.light .recharts-default-tooltip {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08) !important;
+}
+
+html.light .recharts-default-tooltip * {
+  color: #0f172a !important;
+}
+
+html.light .recharts-cartesian-grid line {
+  stroke: #e2e8f0 !important;
+}
+
+html.light .recharts-text {
+  fill: #64748b !important;
+}
+
+/* Shadows */
+html.light .shadow-2xl,
+html.light .shadow-xl {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04) !important;
+}

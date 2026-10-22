@@ -1,13 +1,13 @@
 import { useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react';
+import { AlertCircle } from 'lucide-react';
 import { Sidebar, DashboardTab } from './components/Sidebar';
 import { Header } from './components/Header';
 import { FilterBar } from './components/FilterBar';
-import { TopOverviewCharts } from './components/TopOverviewCharts';
-import { KPISixCards } from './components/KPISixCards';
-import { ExpectancyProfitFactorSection } from './components/ExpectancyProfitFactorSection';
+import { TradeJournalSummaryCards } from './components/TradeJournalSummaryCards';
+import { CoreVisualCharts } from './components/CoreVisualCharts';
+import { CalendarActivityRow } from './components/CalendarActivityRow';
+import { SecondaryKPIs } from './components/SecondaryKPIs';
 import { RecentTradesTable } from './components/RecentTradesTable';
-import { TradeFrequencySection } from './components/TradeFrequencySection';
-import { TradeOutcomesStreakSection } from './components/TradeOutcomesStreakSection';
 
 // Code-split secondary tabs and modal to minimize initial bundle size and startup time
 const ProfitLossSection = lazy(() => import('./components/ProfitLossSection').then(m => ({ default: m.ProfitLossSection })));
@@ -20,7 +20,7 @@ const NotionConnectionModal = lazy(() => import('./components/NotionConnectionMo
 const TabLoadingFallback = () => (
   <div className="py-24 flex flex-col items-center justify-center space-y-3 text-slate-400">
     <div className="w-7 h-7 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
-    <span className="text-xs font-mono text-slate-500">Loading module...</span>
+    <span className="text-xs text-muted-foreground">Loading module...</span>
   </div>
 );
 
@@ -33,9 +33,7 @@ import {
   filterTrades,
   calculateKPIMetrics,
   generateEquityCurve,
-  generateBilateralMonthlyPerformance,
   generateDailyPerformance,
-  calculateTradeFrequency,
   calculateDrawdownAnalytics
 } from './lib/calculations';
 import { fetchTradesData } from './lib/api-client';
@@ -140,26 +138,9 @@ export function App() {
     return generateEquityCurve(filteredTrades);
   }, [filteredTrades, activeTab]);
 
-  // 4. Generate Monthly and Daily distributions for Overview
-  const monthlyPerfData = useMemo(() => {
-    if (activeTab !== 'overview') return [];
-    return generateBilateralMonthlyPerformance(filteredTrades);
-  }, [filteredTrades, activeTab]);
-
   const dailyPerfData = useMemo(() => {
     if (activeTab !== 'overview') return [];
     return generateDailyPerformance(filteredTrades);
-  }, [filteredTrades, activeTab]);
-
-  const tradeFrequencyStats = useMemo(() => {
-    if (activeTab !== 'overview') {
-      return {
-        daily: { data: [], avg: 0 },
-        weekly: { data: [], avg: 0 },
-        monthly: { data: [], avg: 0 },
-      };
-    }
-    return calculateTradeFrequency(filteredTrades);
   }, [filteredTrades, activeTab]);
 
   const drawdownAnalytics = useMemo(() => {
@@ -168,7 +149,7 @@ export function App() {
   }, [filteredTrades, activeTab]);
 
   return (
-    <div className="min-h-screen bg-[#07080b] text-slate-100 flex font-sans selection:bg-white/15 selection:text-slate-100">
+    <div className="min-h-screen bg-background text-foreground flex font-sans selection:bg-primary/20 selection:text-foreground">
       {/* Left Navigation Sidebar */}
       <Sidebar
         activeTab={activeTab}
@@ -212,38 +193,55 @@ export function App() {
           <FilterBar filters={filters} onFilterChange={setFilters} trades={trades} />
         )}
 
+        {/* Live Notion Error Alert Banner (Only shown in live mode when Notion fails or secrets missing) */}
+        {mode === 'live' && error && (
+          <div className="w-full max-w-[95%] lg:max-w-[92%] xl:max-w-[90%] mx-auto px-2 sm:px-4 pt-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-loss/10 border border-loss/30 text-loss text-xs">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <AlertCircle className="w-4 h-4 shrink-0 text-loss" />
+                <span className="truncate sm:whitespace-normal">
+                  <strong>Notion Live Sync:</strong> {error}
+                </span>
+              </div>
+              <button
+                onClick={() => setIsDiagnosticsOpen(true)}
+                className="px-3 py-1.5 rounded-lg bg-loss/20 hover:bg-loss/30 text-loss font-semibold border border-loss/40 transition-colors shrink-0"
+              >
+                Notion Settings
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Main Dashboard Container */}
         <main className="w-full max-w-[95%] lg:max-w-[92%] xl:max-w-[90%] mx-auto px-2 sm:px-4 py-6 flex-1 space-y-6">
-          {/* TAB 1: OVERVIEW */}
+          {/* TAB 1: OVERVIEW / DASHBOARD (Trade-Journal Design & Layout) */}
           {activeTab === 'overview' && (
-            <div className="space-y-6 animate-in fade-in duration-200">
-              {/* Top 3 Charts: Equity mini spline, Monthly Performance bilateral bars, Daily Performance blue bars */}
-              <TopOverviewCharts
+            <div className="space-y-4 sm:space-y-5 animate-in fade-in duration-200">
+              {/* Row 1: Summary KPI Cards (Net P&L, Win %, Profit Factor, Day Win %, Avg Win/Loss) */}
+              <TradeJournalSummaryCards metrics={kpiMetrics} trades={filteredTrades} />
+
+              {/* Row 2: Visuals & Core Charts (Edge Score Radar, Daily Net Cumulative Equity + Relative Drawdown, Net Daily P&L Bars) */}
+              <CoreVisualCharts
                 equityPoints={equityPoints}
-                monthlyData={monthlyPerfData}
                 dailyData={dailyPerfData}
+                metrics={kpiMetrics}
               />
 
-              {/* Middle Row: 6 KPI Cards (Total PnL, Win Rate, Risk/Reward, Month Gain, Week Gain, Daily Gain) */}
-              <KPISixCards metrics={kpiMetrics} />
+              {/* Row 3: Detail Row (Calendar Month Matrix + Activity Tabs) */}
+              <CalendarActivityRow
+                trades={filteredTrades}
+                onNavigateCalendar={() => setActiveTab('calendar')}
+              />
 
-              {/* Current Streak */}
-              <TradeOutcomesStreakSection
+              {/* Row 4: Secondary Metrics & Streaks (Max Drawdown, Streaks, Expectancy, Avg Duration, Best/Worst Day) */}
+              <SecondaryKPIs
                 trades={filteredTrades}
                 metrics={kpiMetrics}
               />
 
-              {/* Expectancy & Profit Factor Section */}
-              <ExpectancyProfitFactorSection
-                trades={filteredTrades}
-                metrics={kpiMetrics}
-              />
-
-              {/* Average Trade Frequency Section */}
-              <TradeFrequencySection stats={tradeFrequencyStats} />
-
-              {/* Recent Trades Table */}
-              <RecentTradesTable trades={filteredTrades} />
+              {/* Row 5: Trades Journal Table */}
+              <RecentTradesTable trades={filteredTrades} title="Recent Executions" />
             </div>
           )}
 
@@ -299,7 +297,7 @@ export function App() {
             <span>
               Notion Trading Analytics • Built for NQ &amp; ES Day Traders • Read-Only Notion API Integration
             </span>
-            <span className="font-mono text-slate-600">
+            <span className="text-slate-600">
               Cloudflare Workers Static Assets • Edge Zero-Node Runtime
             </span>
           </div>

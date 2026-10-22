@@ -160,17 +160,17 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({
   };
 
   return (
-    <div className="bg-[#12141a] border border-[#1f242e] rounded-2xl p-6 shadow-xl space-y-4">
-      {/* Table Header matching Image 1 */}
+    <div className="bg-card border border-border rounded-xl p-5 card-sheen space-y-4">
+      {/* Table Header matching /journal style */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">{title}</h3>
+          <h3 className="text-sm sm:text-base font-semibold text-foreground tracking-tight">{title}</h3>
         </div>
 
         <div className="flex items-center gap-3">
           {/* Quick Search */}
           <div className="relative">
-            <Search className="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-muted-foreground absolute left-2.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search trades..."
@@ -179,7 +179,7 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({
                 setSearchTerm(e.target.value);
                 setPage(1);
               }}
-              className="bg-[#191d26] border border-[#2b313e] focus:border-slate-400 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 w-36 sm:w-48 focus:outline-none transition-colors"
+              className="bg-secondary border border-border focus:border-brand rounded-lg pl-8 pr-3 py-1.5 text-xs text-foreground placeholder-muted-foreground w-36 sm:w-48 focus:outline-none transition-colors"
             />
           </div>
 
@@ -188,8 +188,8 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({
             onClick={() => setShowExtendedColumns(!showExtendedColumns)}
             className={`px-3 py-1.5 rounded-lg border text-xs font-medium flex items-center gap-1.5 transition-colors ${
               showExtendedColumns
-                ? 'bg-[#222834] border-[#384254] text-white shadow-sm'
-                : 'bg-[#191d26] border-[#2b313e] text-slate-400 hover:text-white'
+                ? 'bg-accent border-border text-foreground shadow-sm'
+                : 'bg-secondary border-border text-muted-foreground hover:text-foreground'
             }`}
             title="Toggle Notion columns: Adherence, Mistakes, Screenshots"
           >
@@ -197,47 +197,46 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({
             <span className="hidden sm:inline">Details</span>
           </button>
 
-          {/* Journal Pill Button matching Image 1 */}
+          {/* Journal Pill Button */}
           <button
             onClick={() => {
-              // Open Notion or journal view
               if (trades[0]?.notionUrl) {
                 window.open(trades[0].notionUrl, '_blank');
               } else {
                 setShowExtendedColumns(true);
               }
             }}
-            className="px-3 py-1.5 rounded-lg bg-[#191d26] hover:bg-[#252c3b] border border-[#2b313e] text-white text-xs font-semibold flex items-center gap-2 transition-colors shadow-sm"
+            className="px-3 py-1.5 rounded-lg bg-secondary hover:bg-muted border border-border text-foreground text-xs font-medium flex items-center gap-2 transition-colors shadow-sm"
           >
-            <BookOpen className="w-3.5 h-3.5 text-slate-300" />
+            <BookOpen className="w-3.5 h-3.5 text-muted-foreground" />
             <span>Journal</span>
           </button>
         </div>
       </div>
 
-      {/* Table Content matching Image 1 layout: Name, Date, Symbol, ROI */}
+      {/* Table Content */}
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs whitespace-nowrap">
           <thead>
-            <tr className="border-b border-[#1f242e] text-slate-400 text-xs font-medium select-none">
-              <th className="py-3 px-4 font-semibold">Name</th>
-              <th className="py-3 px-4 font-semibold">Date</th>
-              <th className="py-3 px-4 font-semibold">Symbol</th>
-              <th className="py-3 px-4 text-right font-semibold">ROI</th>
+            <tr className="border-b border-border text-muted-foreground text-xs font-medium select-none">
+              <th className="py-2.5 px-3 font-semibold">Name</th>
+              <th className="py-2.5 px-3 font-semibold">Date</th>
+              <th className="py-2.5 px-3 font-semibold">Symbol</th>
+              <th className="py-2.5 px-3 text-right font-semibold">ROI</th>
               {showExtendedColumns && (
                 <>
-                  <th className="py-3 px-4 font-semibold">Adherence</th>
-                  <th className="py-3 px-4 font-semibold">Mistakes</th>
-                  <th className="py-3 px-3 text-center font-semibold">Media</th>
-                  <th className="py-3 px-3 text-center font-semibold">Notion</th>
+                  <th className="py-2.5 px-3 font-semibold">Adherence</th>
+                  <th className="py-2.5 px-3 font-semibold">Mistakes</th>
+                  <th className="py-2.5 px-3 text-center font-semibold">Media</th>
+                  <th className="py-2.5 px-3 text-center font-semibold">Notion</th>
                 </>
               )}
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#171a22]">
+          <tbody className="divide-y divide-border">
             {paginatedTrades.length === 0 ? (
               <tr>
-                <td colSpan={showExtendedColumns ? 8 : 4} className="py-8 text-center text-slate-500 font-sans text-xs">
+                <td colSpan={showExtendedColumns ? 8 : 4} className="py-8 text-center text-muted-foreground font-sans text-xs">
                   No trades found matching current criteria.
                 </td>
               </tr>
@@ -250,18 +249,18 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({
                   <React.Fragment key={trade.id}>
                     <tr
                       onClick={() => setExpandedTradeId(isExpanded ? null : trade.id)}
-                      className="hover:bg-[#161a23] transition-colors cursor-pointer group"
+                      className="hover:bg-muted/50 transition-colors cursor-pointer group"
                     >
                       {/* Name */}
-                      <td className="py-3.5 px-4 font-medium text-slate-200 group-hover:text-white transition-colors">
+                      <td className="py-2.5 px-3 font-medium text-foreground group-hover:text-foreground transition-colors">
                         <div className="flex items-center gap-2">
                           <span>{trade.title}</span>
                           {trade.position && (
                             <span
-                              className={`px-1.5 py-0.5 text-[10px] rounded font-bold ${
+                              className={`px-1.5 py-0.5 text-[10px] rounded font-semibold ${
                                 trade.position === 'Long'
-                                  ? 'bg-[#00c076]/10 text-[#00c076]'
-                                  : 'bg-[#ff4d4d]/10 text-[#ff4d4d]'
+                                  ? 'bg-profit/10 text-profit border border-profit/20'
+                                  : 'bg-loss/10 text-loss border border-loss/20'
                               }`}
                             >
                               {trade.position}
@@ -273,7 +272,7 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({
                                 e.stopPropagation();
                                 openGallery(trade, 0);
                               }}
-                              className="ml-1 px-1.5 py-0.5 rounded bg-[#1e232e] hover:bg-[#282f3e] text-slate-300 hover:text-white transition-colors inline-flex items-center gap-1 border border-[#2c3444] text-[10px] font-semibold"
+                              className="ml-1 px-1.5 py-0.5 rounded bg-secondary hover:bg-muted text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1 border border-border text-[10px] font-semibold"
                               title={`View ${trade.screenshots.length} screenshot${trade.screenshots.length > 1 ? 's (with slide option)' : ''}`}
                             >
                               <ImageIcon className="w-3 h-3" />
@@ -284,21 +283,21 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({
                       </td>
 
                       {/* Date */}
-                      <td className="py-3.5 px-4 text-slate-400 font-mono">
+                      <td className="py-2.5 px-3 text-muted-foreground tnum">
                         {trade.date || '—'}
                       </td>
 
                       {/* Symbol */}
-                      <td className="py-3.5 px-4 font-semibold text-white">
+                      <td className="py-2.5 px-3 font-semibold text-foreground">
                         {trade.ticker || '—'}
                       </td>
 
                       {/* ROI */}
-                      <td className="py-3.5 px-4 text-right font-mono font-bold">
-                        <span className={isWin ? 'text-[#00c076]' : 'text-[#ff4d4d]'}>
+                      <td className="py-2.5 px-3 text-right tnum font-bold">
+                        <span className={isWin ? 'text-profit' : 'text-loss'}>
                           {formattedDollar}
                         </span>
-                        <span className="text-slate-500 text-[11px] font-normal ml-1">
+                        <span className="text-muted-foreground text-[11px] font-normal ml-1">
                           {rText}
                         </span>
                       </td>
@@ -307,78 +306,78 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({
                       {showExtendedColumns && (
                         <>
                           {/* Adherence */}
-                          <td className="py-3.5 px-4">
+                          <td className="py-2.5 px-3">
                             {trade.ruleAdherence ? (
                               <span
                                 className={`px-2 py-0.5 rounded text-[10px] font-medium ${
                                   trade.ruleAdherence === 'Followed'
-                                    ? 'bg-emerald-950/40 text-emerald-400 border border-emerald-800/40'
+                                    ? 'bg-profit/10 text-profit border border-profit/20'
                                     : trade.ruleAdherence === 'Partially Followed'
-                                    ? 'bg-amber-950/40 text-amber-400 border border-amber-800/40'
-                                    : 'bg-rose-950/40 text-rose-400 border border-rose-800/40'
+                                    ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
+                                    : 'bg-loss/10 text-loss border border-loss/20'
                                 }`}
                               >
                                 {trade.ruleAdherence}
                               </span>
                             ) : (
-                              <span className="text-slate-600">—</span>
+                              <span className="text-muted-foreground">—</span>
                             )}
                           </td>
 
                           {/* Mistakes */}
-                          <td className="py-3.5 px-4 max-w-[200px] truncate">
+                          <td className="py-2.5 px-3 max-w-[200px] truncate">
                             {trade.mistakes.length > 0 ? (
                               <div className="flex flex-wrap gap-1">
                                 {trade.mistakes.map((m, idx) => (
                                   <span
                                     key={idx}
-                                    className="px-1.5 py-0.5 rounded bg-rose-950/30 text-rose-300 text-[10px] border border-rose-900/40"
+                                    className="px-1.5 py-0.5 rounded bg-loss/10 text-loss text-[10px] border border-loss/20"
                                   >
                                     {m}
                                   </span>
                                 ))}
                               </div>
                             ) : (
-                              <span className="text-slate-600">—</span>
+                              <span className="text-muted-foreground">—</span>
                             )}
                           </td>
 
                           {/* Media */}
-                          <td className="py-3.5 px-3 text-center">
+                          <td className="py-2.5 px-3 text-center">
                             {trade.screenshots.length > 0 ? (
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   openGallery(trade, 0);
                                 }}
-                                className="px-2 py-1 rounded bg-[#1e2430] hover:bg-[#2b3345] text-slate-300 hover:text-white transition-colors inline-flex items-center justify-center gap-1.5 border border-[#2d3647]"
+                                className="px-2 py-1 rounded bg-secondary hover:bg-muted text-muted-foreground hover:text-foreground transition-colors inline-flex items-center justify-center gap-1.5 border border-border"
                                 title={`View ${trade.screenshots.length} screenshot${trade.screenshots.length > 1 ? 's (with slide option)' : ''}`}
                               >
                                 <ImageIcon className="w-3.5 h-3.5" />
-                                <span className="text-[11px] font-semibold font-mono">
+                                <span className="text-[11px] font-semibold tnum">
                                   {trade.screenshots.length}
                                 </span>
                               </button>
                             ) : (
-                              <span className="text-slate-600">—</span>
+                              <span className="text-muted-foreground">—</span>
                             )}
                           </td>
 
                           {/* Notion Link */}
-                          <td className="py-3.5 px-3 text-center">
+                          <td className="py-2.5 px-3 text-center">
                             {trade.notionUrl ? (
                               <a
                                 href={trade.notionUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={(e) => e.stopPropagation()}
-                                className="p-1 rounded bg-[#1e2430] hover:bg-[#2b3345] text-slate-400 hover:text-white transition-colors inline-flex items-center justify-center"
+                                className="p-1 rounded bg-secondary hover:bg-muted text-muted-foreground hover:text-foreground transition-colors inline-flex items-center justify-center"
                                 title="Open in Notion"
                               >
                                 <ExternalLink className="w-3.5 h-3.5" />
                               </a>
                             ) : (
-                              <span className="text-slate-600">—</span>
+                              <span className="text-muted-foreground">—</span>
                             )}
                           </td>
                         </>
@@ -387,25 +386,25 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({
 
                     {/* Expandable details when row is clicked */}
                     {isExpanded && !showExtendedColumns && (
-                      <tr className="bg-[#0e1015]/60 text-xs">
-                        <td colSpan={4} className="py-3 px-6 text-slate-300">
+                      <tr className="bg-muted/40 text-xs">
+                        <td colSpan={4} className="py-3 px-6 text-foreground">
                           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 py-1">
                             <div>
-                              <span className="text-slate-500 block text-[10px] uppercase font-semibold">Sequence</span>
-                              <span className="font-medium text-white">{trade.sequence || 'None'}</span>
+                              <span className="text-muted-foreground block text-[10px] uppercase font-semibold">Sequence</span>
+                              <span className="font-medium text-foreground">{trade.sequence || 'None'}</span>
                             </div>
                             <div>
-                              <span className="text-slate-500 block text-[10px] uppercase font-semibold">Rule Adherence</span>
-                              <span className="font-medium text-white">{trade.ruleAdherence || 'Not set'}</span>
+                              <span className="text-muted-foreground block text-[10px] uppercase font-semibold">Rule Adherence</span>
+                              <span className="font-medium text-foreground">{trade.ruleAdherence || 'Not set'}</span>
                             </div>
                             <div>
-                              <span className="text-slate-500 block text-[10px] uppercase font-semibold">Mistakes</span>
-                              <span className="font-medium text-white">
+                              <span className="text-muted-foreground block text-[10px] uppercase font-semibold">Mistakes</span>
+                              <span className="font-medium text-foreground">
                                 {trade.mistakes.length > 0 ? trade.mistakes.join(', ') : 'None'}
                               </span>
                             </div>
                             <div>
-                              <span className="text-slate-500 block text-[10px] uppercase font-semibold">Actions</span>
+                              <span className="text-muted-foreground block text-[10px] uppercase font-semibold">Actions</span>
                               <div className="flex items-center gap-2 mt-0.5">
                                 {trade.screenshots.length > 0 && (
                                   <button
@@ -413,7 +412,7 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({
                                       e.stopPropagation();
                                       openGallery(trade, 0);
                                     }}
-                                    className="text-xs text-slate-300 hover:text-white hover:underline flex items-center gap-1.5 font-medium"
+                                    className="text-xs text-muted-foreground hover:text-foreground hover:underline flex items-center gap-1.5 font-medium"
                                   >
                                     <ImageIcon className="w-3.5 h-3.5" />
                                     <span>Screenshots ({trade.screenshots.length})</span>
@@ -424,7 +423,7 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({
                                     href={trade.notionUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-xs text-slate-400 hover:text-white hover:underline flex items-center gap-1"
+                                    className="text-xs text-muted-foreground hover:text-foreground hover:underline flex items-center gap-1"
                                   >
                                     <ExternalLink className="w-3 h-3" /> Notion
                                   </a>
@@ -443,8 +442,8 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({
         </table>
       </div>
 
-      {/* Footer matching Image 1: Rows per page [ 5 v ] and 1-5 of 10  <  > */}
-      <div className="flex items-center justify-between pt-3 border-t border-[#1f242e] text-xs text-slate-400">
+      {/* Footer matching /journal: Rows per page [ 5 v ] and 1-5 of 10  <  > */}
+      <div className="flex items-center justify-between pt-3 border-t border-border text-xs text-muted-foreground">
         {/* Left: Rows per page selector */}
         <div className="flex items-center gap-2">
           <span>Rows per page</span>
@@ -455,14 +454,14 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({
                 setPageSize(Number(e.target.value));
                 setPage(1);
               }}
-              className="bg-[#191d26] border border-[#2b313e] text-white text-xs font-semibold rounded-lg px-2.5 py-1 pr-6 appearance-none focus:outline-none cursor-pointer"
+              className="bg-secondary border border-border text-foreground text-xs font-semibold rounded-lg px-2.5 py-1 pr-6 appearance-none focus:outline-none cursor-pointer"
             >
               <option value={5}>5</option>
               <option value={10}>10</option>
               <option value={25}>25</option>
               <option value={50}>50</option>
             </select>
-            <ChevronDown className="w-3 h-3 text-slate-400 absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ChevronDown className="w-3 h-3 text-muted-foreground absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
         </div>
 
@@ -475,7 +474,7 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="p-1 rounded hover:bg-[#191d26] text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="p-1 rounded hover:bg-secondary text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               title="Previous page"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -483,7 +482,7 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages || totalPages === 0}
-              className="p-1 rounded hover:bg-[#191d26] text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="p-1 rounded hover:bg-secondary text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               title="Next page"
             >
               <ChevronRight className="w-4 h-4" />
@@ -502,28 +501,28 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({
 
         return (
           <div
-            className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 md:p-6 select-none animate-in fade-in duration-150"
+            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 md:p-6 select-none animate-in fade-in duration-150"
             onClick={closeGallery}
           >
             <div
-              className="bg-[#12141a] border border-[#1f242e] rounded-2xl max-w-5xl w-full flex flex-col overflow-hidden relative shadow-2xl max-h-[94vh]"
+              className="bg-card border border-border rounded-xl max-w-5xl w-full flex flex-col overflow-hidden relative shadow-2xl max-h-[94vh]"
               onClick={(e) => e.stopPropagation()}
               onTouchStart={handleTouchStart}
               onTouchEnd={handleTouchEnd}
             >
               {/* Header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-[#1f242e] bg-[#0e1015]">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-secondary">
                 <div className="flex items-center gap-2.5 min-w-0 pr-2">
-                  <span className="text-xs font-semibold text-white truncate max-w-xs sm:max-w-md">
+                  <span className="text-xs font-semibold text-foreground truncate max-w-xs sm:max-w-md">
                     {currentScreenshot.name || `Screenshot ${galleryState.currentIndex + 1}`}
                   </span>
                   {galleryState.tradeTitle && (
-                    <span className="hidden sm:inline-block px-2 py-0.5 rounded bg-[#1e2430] text-slate-300 text-[11px] font-mono border border-slate-700/50 truncate max-w-[150px]">
+                    <span className="hidden sm:inline-block px-2 py-0.5 rounded bg-muted text-muted-foreground text-[11px] font-medium border border-border truncate max-w-[150px]">
                       {galleryState.tradeTitle}
                     </span>
                   )}
                   {hasMultiple && (
-                    <span className="px-2 py-0.5 rounded-full bg-[#1e232e] border border-[#2e3646] text-slate-300 text-[11px] font-semibold whitespace-nowrap">
+                    <span className="px-2 py-0.5 rounded-full bg-muted border border-border text-foreground text-[11px] font-semibold whitespace-nowrap">
                       {galleryState.currentIndex + 1} / {totalCount}
                     </span>
                   )}
@@ -534,7 +533,7 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({
                     href={currentScreenshot.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-slate-300 hover:text-white hover:underline flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#1a1f2c] border border-[#2e3646] transition-colors"
+                    className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1.5 px-2.5 py-1 rounded bg-muted border border-border transition-colors"
                     title="Open full resolution in new tab"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -542,7 +541,7 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({
                   </a>
                   <button
                     onClick={closeGallery}
-                    className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-[#191d26] transition-colors"
+                    className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors"
                     title="Close (Esc)"
                   >
                     <X className="w-4 h-4" />
@@ -593,7 +592,7 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({
 
               {/* Bottom Slide Option & Thumbnails Strip */}
               {hasMultiple && (
-                <div className="px-4 py-3 bg-[#0e1015] border-t border-[#1f242e] flex flex-col gap-2.5">
+                <div className="px-4 py-3 bg-secondary border-t border-border flex flex-col gap-2.5">
                   {/* Thumbnails Row */}
                   <div className="flex items-center justify-center gap-2 overflow-x-auto py-1 scrollbar-thin">
                     {galleryState.screenshots.map((s, idx) => {
@@ -604,8 +603,8 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({
                           onClick={() => goToSlide(idx)}
                           className={`relative rounded-lg overflow-hidden border transition-all shrink-0 w-16 h-12 sm:w-20 sm:h-14 bg-black/40 ${
                             isActive
-                              ? 'ring-2 ring-slate-400 border-slate-300 opacity-100 scale-105'
-                              : 'border-[#222836] opacity-50 hover:opacity-90 hover:border-slate-500'
+                              ? 'ring-2 ring-brand border-brand opacity-100 scale-105'
+                              : 'border-border opacity-50 hover:opacity-90'
                           }`}
                           title={`Slide ${idx + 1}: ${s.name}`}
                         >
@@ -615,9 +614,9 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({
                             className="w-full h-full object-cover"
                           />
                           <span
-                            className={`absolute bottom-0.5 right-0.5 text-[9px] font-mono font-bold px-1 rounded ${
+                            className={`absolute bottom-0.5 right-0.5 text-[9px] tabular-nums font-bold px-1 rounded ${
                               isActive
-                                ? 'bg-[#2b3240] text-white'
+                                ? 'bg-brand text-white'
                                 : 'bg-black/70 text-slate-300'
                             }`}
                           >
@@ -629,7 +628,7 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({
                   </div>
 
                   {/* Dots & Keyboard Hint */}
-                  <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+                  <div className="flex items-center justify-between text-[11px] text-muted-foreground px-1">
                     <div className="flex items-center gap-1.5">
                       {galleryState.screenshots.map((_, idx) => (
                         <button
@@ -637,15 +636,15 @@ export const RecentTradesTable: React.FC<RecentTradesTableProps> = ({
                           onClick={() => goToSlide(idx)}
                           className={`h-1.5 rounded-full transition-all ${
                             idx === galleryState.currentIndex
-                              ? 'w-6 bg-slate-300'
-                              : 'w-2 bg-slate-600 hover:bg-slate-400'
+                              ? 'w-6 bg-foreground'
+                              : 'w-2 bg-muted-foreground/40 hover:bg-muted-foreground'
                           }`}
                           title={`Go to slide ${idx + 1}`}
                         />
                       ))}
                     </div>
-                    <span className="text-slate-500 hidden sm:inline">
-                      Use <kbd className="px-1 py-0.5 bg-[#191d26] rounded text-slate-400 border border-slate-700 font-mono">←</kbd> and <kbd className="px-1 py-0.5 bg-[#191d26] rounded text-slate-400 border border-slate-700 font-mono">→</kbd> to slide • <kbd className="px-1 py-0.5 bg-[#191d26] rounded text-slate-400 border border-slate-700 font-mono">Esc</kbd> to close
+                    <span className="text-muted-foreground hidden sm:inline">
+                      Use <kbd className="px-1 py-0.5 bg-muted rounded text-foreground border border-border font-medium">←</kbd> and <kbd className="px-1 py-0.5 bg-muted rounded text-foreground border border-border font-medium">→</kbd> to slide • <kbd className="px-1 py-0.5 bg-muted rounded text-foreground border border-border font-medium">Esc</kbd> to close
                     </span>
                   </div>
                 </div>

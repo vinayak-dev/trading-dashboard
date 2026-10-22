@@ -135,6 +135,15 @@ export function mapNotionPageToTrade(page: any): TradeRecord {
     rawRR = Number(rrProp.number);
   }
 
+  // 11b. Dollar PnL: Number — actual dollar profit/loss from Notion
+  let dollarPnl: number | null = null;
+  const pnlProp = props['PNL'] || props['PnL'] || props['P&L'] || props['Pnl'] || props['pnl']
+    || props['Dollar PnL'] || props['DollarPnL'] || props['Net P&L'] || props['Net PnL']
+    || props['Profit'] || props['Profit/Loss'];
+  if (pnlProp?.type === 'number' && pnlProp.number !== null && !isNaN(pnlProp.number)) {
+    dollarPnl = Number(pnlProp.number);
+  }
+
   // 12. Realized R calculation from rawRR & Result
   const realizedR = resolveRealizedR(rawRR, result);
   const plannedRR = rawRR !== null ? Math.abs(rawRR) : null;
@@ -206,6 +215,7 @@ export function mapNotionPageToTrade(page: any): TradeRecord {
     plannedRR,
     realizedR,
     rawRR,
+    dollarPnl,
     screenshots,
     notionUrl: page.url || null,
     isExecutedTrade,

@@ -291,6 +291,57 @@ export function calculateKPIMetrics(trades: TradeRecord[]): KPIMetrics {
     t.mistakes.some(m => m.toLowerCase().includes('missed valid setup'))
   ).length;
 
+  // Real daily, weekly, and monthly gain/loss computed from trade records
+  let dailyGainLoss = 0;
+  let weekGainLoss = 0;
+  let monthGainLoss = 0;
+
+  const datedTrades = executedTrades
+    .filter(t => t.date)
+    .sort((a, b) => a.date!.localeCompare(b.date!));
+
+  if (datedTrades.length > 0) {
+    const latestDateStr = datedTrades[datedTrades.length - 1].date!;
+    const latestDate = new Date(latestDateStr + 'T00:00:00');
+    const latestYear = latestDate.getFullYear();
+    const latestMonth = latestDate.getMonth();
+
+    const sevenDaysAgo = new Date(latestDate);
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    for (const t of datedTrades) {
+      const pnl =
+        t.dollarPnl !== undefined && t.dollarPnl !== null
+          ? t.dollarPnl
+          : t.realizedR !== null && t.realizedR !== undefined
+          ? t.realizedR * 500
+          : 0;
+
+      if (t.date === latestDateStr) {
+        dailyGainLoss += pnl;
+      }
+
+      const tDate = new Date(t.date! + 'T00:00:00');
+      if (tDate >= sevenDaysAgo && tDate <= latestDate) {
+        weekGainLoss += pnl;
+      }
+
+      if (tDate.getFullYear() === latestYear && tDate.getMonth() === latestMonth) {
+        monthGainLoss += pnl;
+      }
+    }
+  }
+  dailyGainLoss = Number(dailyGainLoss.toFixed(2));
+  weekGainLoss = Number(weekGainLoss.toFixed(2));
+  monthGainLoss = Number(monthGainLoss.toFixed(2));
+
+  const calculatedRR =
+    wins.length > 0 && losses.length > 0 && avgLossPct !== 0
+      ? Number(Math.abs(avgWinPct / avgLossPct).toFixed(2))
+      : avgWinR !== null && avgLossR !== null && avgLossR > 0
+      ? Number((avgWinR / avgLossR).toFixed(2))
+      : 0.0;
+
   return {
     totalTrades,
     executedTrades: executedTrades.length,
@@ -310,30 +361,30 @@ export function calculateKPIMetrics(trades: TradeRecord[]): KPIMetrics {
     validSetupsMissed,
     hasRealizedRData,
 
-    // Exact metrics from screenshots
+    // Real metrics computed from trade dataset
     totalPnl,
     accountBalance,
     accountGainPct,
-    riskRewardRatio: 0.0,
-    monthGainLoss: totalPnl > 0 ? (totalPnl === 1347.5 ? 673.75 : Number((totalPnl * 0.5).toFixed(2))) : 0,
-    weekGainLoss: totalPnl > 0 ? (totalPnl === 1347.5 ? 336.88 : Number((totalPnl * 0.25).toFixed(2))) : 0,
-    dailyGainLoss: totalPnl > 0 ? (totalPnl === 1347.5 ? 269.5 : Number((totalPnl * 0.2).toFixed(2))) : 0,
+    riskRewardRatio: calculatedRR,
+    monthGainLoss,
+    weekGainLoss,
+    dailyGainLoss,
 
-    bestWinPct: bestWinPct || 3.68,
-    avgWinPct: avgWinPct || 1.27,
-    worstLossPct: worstLossPct || -2.97,
-    avgLossPct: avgLossPct || -1.2,
-    avgWinDuration: '7h 10m',
-    avgLossDuration: '7h 46m',
+    bestWinPct,
+    avgWinPct,
+    worstLossPct,
+    avgLossPct,
+    avgWinDuration: '',
+    avgLossDuration: '',
 
-    maxConsecutiveWins: streaks.maxConsecutiveWins || 3,
-    avgConsecutiveWins: streaks.avgConsecutiveWins || 1.5,
-    maxConsecutiveLosses: streaks.maxConsecutiveLosses || 2,
-    avgConsecutiveLosses: streaks.avgConsecutiveLosses || 1.33,
+    maxConsecutiveWins: streaks.maxConsecutiveWins,
+    avgConsecutiveWins: streaks.avgConsecutiveWins,
+    maxConsecutiveLosses: streaks.maxConsecutiveLosses,
+    avgConsecutiveLosses: streaks.avgConsecutiveLosses,
     currentStreak: streaks.currentStreak,
 
-    buyTradesCount: buyTrades.length || 5,
-    sellTradesCount: sellTrades.length || 5,
+    buyTradesCount: buyTrades.length,
+    sellTradesCount: sellTrades.length,
     buyWinRate,
     sellWinRate,
 
